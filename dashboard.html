@@ -332,42 +332,56 @@
     <div class="page" id="page-parent-subscription">
       <div class="card">
         <div class="card-header"><div class="card-title"><i class="fas fa-credit-card"></i> اشتراك منظوري</div></div>
-        <div class="form-grid" style="margin-bottom:16px">
-          <div class="form-group"><label>اسم المنظور</label><input type="text" class="form-control" id="parentChildName" placeholder="الاسم الكامل"></div>
-          <div class="form-group"><label>المستوى الدراسي</label>
-            <select class="form-control" id="parentChildLevel">
-              <option value="">اختر</option>
-              <option value="7">السنة السابعة أساسي</option>
-              <option value="8">السنة الثامنة أساسي</option>
-              <option value="9">السنة التاسعة أساسي</option>
-            </select>
+        <div id="parentSubContent">
+          <div style="background:rgba(37,99,235,.06);border:1px solid rgba(37,99,235,.15);border-radius:12px;padding:16px;margin-bottom:20px">
+            <p style="font-size:.88rem;color:var(--blue-dark)"><i class="fas fa-info-circle" style="color:var(--blue-light)"></i> يجب ربط منظورك أولاً من صفحة "ربط منظور" قبل الاشتراك</p>
           </div>
-          <div class="form-group"><label>العرض</label>
-            <select class="form-control" id="parentPlan">
-              <option value="">اختر</option>
-              <option value="recordings">التسجيلات — 50 د.ت/سنة</option>
-              <option value="sessions">الحصص المباشرة — 40 د.ت/8 حصص</option>
-            </select>
+          <div class="form-grid" style="margin-bottom:16px">
+            <div class="form-group">
+              <label>اختر المنظور *</label>
+              <select class="form-control" id="parentChildSelect" required>
+                <option value="">اختر المنظور</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>العرض *</label>
+              <select class="form-control" id="parentPlan">
+                <option value="">اختر العرض</option>
+                <option value="recordings">التسجيلات — 50 د.ت/سنة</option>
+                <option value="sessions">الحصص المباشرة — 40 د.ت/8 حصص</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>طريقة الدفع *</label>
+              <select class="form-control" id="parentPayMethod">
+                <option value="">اختر الطريقة</option>
+                <option value="bank">تحويل بنكي</option>
+                <option value="post">البريد التونسي</option>
+                <option value="d17">D17</option>
+                <option value="edinar">Carte eDinar</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>رقم مرجع التحويل (اختياري)</label>
+              <input type="text" class="form-control" id="parentTransferRef" placeholder="رقم المرجع أو التأكيد">
+            </div>
           </div>
-          <div class="form-group"><label>طريقة الدفع</label>
-            <select class="form-control" id="parentPayMethod">
-              <option value="">اختر</option>
-              <option value="bank">تحويل بنكي</option>
-              <option value="post">البريد التونسي</option>
-              <option value="d17">D17</option>
-              <option value="edinar">Carte eDinar</option>
-            </select>
+          <div class="form-group" style="margin-bottom:16px">
+            <label>صورة وصل الخلاص <span style="color:var(--danger)">*</span></label>
+            <label class="upload-zone" for="parentReceiptFile">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <p>انقر لرفع صورة الوصل (JPG, PNG, PDF)</p>
+              <input type="file" id="parentReceiptFile" accept="image/jpeg,image/png,image/webp,.pdf" required onchange="showFN(this,'prfn');previewParentReceipt(this)">
+            </label>
+            <div id="prfn" style="font-size:.82rem;color:var(--success);margin-top:6px;display:none"></div>
+            <div id="parentReceiptPreview" style="margin-top:10px;display:none">
+              <img id="parentReceiptImg" src="" style="max-height:120px;border-radius:8px;border:1px solid var(--gray-200)">
+            </div>
           </div>
+          <button class="btn btn-primary" onclick="submitParentReceipt()">
+            <i class="fas fa-paper-plane"></i> إرسال الوصل
+          </button>
         </div>
-        <div class="form-group" style="margin-bottom:16px">
-          <label>صورة وصل الخلاص</label>
-          <label class="upload-zone" for="parentReceiptFile">
-            <i class="fas fa-cloud-upload-alt"></i><p>انقر لرفع الوصل</p>
-            <input type="file" id="parentReceiptFile" accept="image/*,.pdf" onchange="showFN(this,'prfn')">
-          </label>
-          <div id="prfn" style="font-size:.82rem;color:var(--success);margin-top:6px;display:none"></div>
-        </div>
-        <button class="btn btn-primary" onclick="submitParentReceipt()"><i class="fas fa-paper-plane"></i> إرسال الوصل</button>
       </div>
     </div>
 
@@ -860,57 +874,164 @@ async function loadParent() {
   try {
     const q = query(collection(db,'parentChildren'), where('parentId','==',CU.uid));
     const snap = await getDocs(q);
-    const children=[];
+    const children = [];
     for (const d of snap.docs) {
       const cd = d.data();
-      const csnap = await getDoc(doc(db,'users',cd.childId));
-      if (csnap.exists()) children.push({linkId:d.id,...cd,childData:csnap.data()});
+      try {
+        const csnap = await getDoc(doc(db,'users',cd.childId));
+        if (csnap.exists()) children.push({linkId:d.id,...cd,childData:csnap.data()});
+        else children.push({linkId:d.id,...cd,childData:{firstName:cd.childName||'—',level:'—',subscriptionStatus:'inactive'}});
+      } catch {
+        children.push({linkId:d.id,...cd,childData:{firstName:cd.childName||'—',level:'—',subscriptionStatus:'inactive'}});
+      }
     }
-    $('parentChildrenList').innerHTML = children.length ? children.map(c=>`
-      <div class="child-card">
-        <div class="child-info">
-          <h4>${c.childData.firstName||''} ${c.childData.lastName||c.childData.name||''}</h4>
-          <p>السنة ${c.childData.level||'—'} • ${subBadge(c.childData.subscriptionStatus)}</p>
-        </div>
-        <button class="btn btn-danger-outline btn-sm" onclick="unlinkChild('${c.linkId}')"><i class="fas fa-unlink"></i> فك الربط</button>
-      </div>`).join('') :
-      `<div class="empty-state"><i class="fas fa-child"></i><h3>لا يوجد منظورون مرتبطون</h3><p>استخدم "ربط منظور" لإضافة منظور</p></div>`;
-  } catch {$('parentChildrenList').innerHTML=`<div class="empty-state"><i class="fas fa-child"></i><h3>لا يوجد منظورون</h3></div>`;}
+
+    // عرض قائمة المنظورين
+    $('parentChildrenList').innerHTML = children.length ? children.map(c => {
+      const name = c.childData.firstName ? `${c.childData.firstName} ${c.childData.lastName||''}` : (c.childName||'—');
+      return `
+        <div class="child-card">
+          <div class="child-info">
+            <h4><i class="fas fa-user-graduate" style="color:var(--blue-light)"></i> ${name}</h4>
+            <p>السنة ${c.childData.level||'—'} • ${c.childEmail} • ${subBadge(c.childData.subscriptionStatus)}</p>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-outline btn-sm" onclick="showPage('parent-subscription')">
+              <i class="fas fa-credit-card"></i> اشتراك
+            </button>
+            <button class="btn btn-danger-outline btn-sm" onclick="unlinkChild('${c.linkId}')">
+              <i class="fas fa-unlink"></i>
+            </button>
+          </div>
+        </div>`;
+    }).join('') :
+    `<div class="empty-state">
+      <i class="fas fa-child"></i>
+      <h3>لا يوجد منظورون مرتبطون</h3>
+      <p>اضغط "ربط منظور" للبحث عن منظورك وربطه بحسابك</p>
+      <button class="btn btn-primary" style="margin-top:14px" onclick="showPage('parent-link')">
+        <i class="fas fa-link"></i> ربط منظور
+      </button>
+    </div>`;
+
+    // تحديث قائمة الاختيار في صفحة الاشتراك
+    const sel = $('parentChildSelect');
+    if (sel) {
+      sel.innerHTML = '<option value="">اختر المنظور</option>';
+      children.forEach(c => {
+        const name = c.childData.firstName ? `${c.childData.firstName} ${c.childData.lastName||''}` : (c.childName||c.childEmail);
+        const opt = document.createElement('option');
+        opt.value = c.childId;
+        opt.textContent = name;
+        sel.appendChild(opt);
+      });
+    }
+
+  } catch(err) {
+    $('parentChildrenList').innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-child"></i>
+        <h3>لا يوجد منظورون</h3>
+        <p style="color:var(--danger);font-size:.82rem">${err.message}</p>
+      </div>`;
+  }
 }
 
 window.searchChild = async function() {
-  const email = $('childEmail').value.trim();
-  if (!email) return;
+  const email = $('childEmail').value.trim().toLowerCase();
+  if (!email) { alert('يرجى إدخال البريد الإلكتروني'); return; }
   const res = $('childSearchResult');
-  res.innerHTML = '<p style="color:var(--gray-600);font-size:.85rem">جاري البحث...</p>';
+  res.innerHTML = '<p style="color:var(--gray-600);font-size:.85rem"><i class="fas fa-spinner fa-spin"></i> جاري البحث...</p>';
   try {
-    const q = query(collection(db,'users'), where('email','==',email));
+    // نبحث في collection students بدل users لتجنب قواعد الأمان
+    const q = query(
+      collection(db,'users'),
+      where('email','==',email),
+      where('userType','==','student')
+    );
     const snap = await getDocs(q);
-    if (snap.empty) { res.innerHTML='<p style="color:var(--danger);font-size:.85rem">⚠️ لم يتم العثور على مستخدم بهذا البريد</p>'; return; }
+
+    if (snap.empty) {
+      res.innerHTML = `
+        <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:14px">
+          <p style="color:var(--danger);font-size:.88rem">⚠️ لم يتم العثور على تلميذ بهذا البريد</p>
+          <p style="color:var(--gray-600);font-size:.82rem;margin-top:6px">تأكد أن التلميذ مسجّل في المنصة وأن البريد صحيح</p>
+        </div>`;
+      return;
+    }
+
     const child = snap.docs[0];
-    const cd = child.data();
-    if (cd.userType !== 'student') { res.innerHTML='<p style="color:var(--danger);font-size:.85rem">⚠️ هذا الحساب ليس تلميذاً</p>'; return; }
+    const cd    = child.data();
+    const name  = cd.firstName ? `${cd.firstName} ${cd.lastName||''}` : (cd.name||'—');
+
     res.innerHTML = `
-      <div class="child-card">
+      <div class="child-card" style="border-color:var(--success)">
         <div class="child-info">
-          <h4>${cd.firstName||''} ${cd.lastName||cd.name||''}</h4>
-          <p>السنة ${cd.level||'—'} • ${cd.email}</p>
+          <h4>✅ ${name}</h4>
+          <p>السنة ${cd.level||'—'} • ${cd.email} • ${subBadge(cd.subscriptionStatus)}</p>
         </div>
-        <button class="btn btn-success btn-sm" onclick="linkChild('${child.id}','${cd.email}')"><i class="fas fa-link"></i> ربط</button>
+        <button class="btn btn-success btn-sm" onclick="linkChild('${child.id}','${cd.email}','${name}')">
+          <i class="fas fa-link"></i> ربط هذا التلميذ
+        </button>
       </div>`;
-  } catch {res.innerHTML='<p style="color:var(--danger);font-size:.85rem">خطأ في البحث</p>';}
+  } catch(err) {
+    // إذا فشل بسبب قواعد Firestore — نعطي رسالة واضحة
+    if (err.code === 'permission-denied') {
+      res.innerHTML = `
+        <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:14px">
+          <p style="color:var(--warning);font-size:.88rem">⚠️ يجب تحديث قواعد Firestore</p>
+          <p style="color:var(--gray-600);font-size:.82rem;margin-top:6px">اذهب إلى Firebase → Firestore → Règles وطبّق القواعد الجديدة</p>
+        </div>`;
+    } else {
+      res.innerHTML = `<p style="color:var(--danger);font-size:.85rem">خطأ: ${err.message}</p>`;
+    }
+  }
 };
 
-window.linkChild = async function(childId, childEmail) {
+window.linkChild = async function(childId, childEmail, childName) {
   try {
-    const existing = await getDocs(query(collection(db,'parentChildren'), where('parentId','==',CU.uid), where('childId','==',childId)));
+    // تحقق أن المنظور غير مرتبط مسبقاً
+    const existing = await getDocs(query(
+      collection(db,'parentChildren'),
+      where('parentId','==',CU.uid),
+      where('childId','==',childId)
+    ));
     if (!existing.empty) { alert('هذا المنظور مرتبط بك مسبقاً'); return; }
-    await addDoc(collection(db,'parentChildren'), {parentId:CU.uid,childId,childEmail,createdAt:serverTimestamp()});
+
+    await addDoc(collection(db,'parentChildren'), {
+      parentId: CU.uid,
+      childId,
+      childEmail,
+      childName: childName || childEmail,
+      createdAt: serverTimestamp()
+    });
+
     alert('✅ تم ربط المنظور بنجاح!');
-    $('childSearchResult').innerHTML=''; $('childEmail').value='';
+    $('childSearchResult').innerHTML = '';
+    $('childEmail').value = '';
+
+    // تحديث قائمة المنظورين في صفحة الاشتراك
+    updateParentSubscriptionList();
     loadParent();
-  } catch(e){alert('خطأ: '+e.message);}
+  } catch(e) { alert('خطأ: ' + e.message); }
 };
+
+// تحديث قائمة المنظورين في صفحة الاشتراك
+async function updateParentSubscriptionList() {
+  try {
+    const q = query(collection(db,'parentChildren'), where('parentId','==',CU.uid));
+    const snap = await getDocs(q);
+    const sel = $('parentChildSelect');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">اختر المنظور</option>';
+    snap.forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d.data().childId;
+      opt.textContent = d.data().childName || d.data().childEmail;
+      sel.appendChild(opt);
+    });
+  } catch {}
+}
 
 window.unlinkChild = async function(linkId) {
   if (!confirm('هل تريد إلغاء الربط؟')) return;
@@ -919,14 +1040,16 @@ window.unlinkChild = async function(linkId) {
 };
 
 window.submitParentReceipt = async function() {
-  const childName = $('parentChildName').value;
-  const level     = $('parentChildLevel').value;
-  const plan      = $('parentPlan').value;
-  const method    = $('parentPayMethod').value;
-  const file      = $('parentReceiptFile').files[0];
+  const childId  = $('parentChildSelect')?.value;
+  const plan     = $('parentPlan').value;
+  const method   = $('parentPayMethod').value;
+  const ref_     = $('parentTransferRef')?.value || '';
+  const file     = $('parentReceiptFile').files[0];
 
-  if (!childName || !level || !plan || !method) { alert('يرجى إكمال جميع الحقول'); return; }
-  if (!file) { alert('يرجى رفع صورة وصل الخلاص'); return; }
+  if (!childId)  { alert('يرجى اختيار المنظور أولاً — اذهب لصفحة "ربط منظور"'); return; }
+  if (!plan)     { alert('يرجى اختيار العرض'); return; }
+  if (!method)   { alert('يرجى اختيار طريقة الدفع'); return; }
+  if (!file)     { alert('يرجى رفع صورة وصل الخلاص'); return; }
 
   const btn = document.querySelector('[onclick="submitParentReceipt()"]');
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الرفع...'; }
@@ -934,23 +1057,46 @@ window.submitParentReceipt = async function() {
   try {
     const receiptURL = await uploadToCloudinary(file);
     const name = CUD.firstName ? `${CUD.firstName} ${CUD.lastName||''}` : CUD.name;
+
+    // نجد اسم المنظور من القائمة
+    const sel = $('parentChildSelect');
+    const childName = sel?.options[sel.selectedIndex]?.text || '';
+
     await addDoc(collection(db,'receipts'), {
-      userId: CU.uid, name, email: CU.email,
-      childName, level, plan,
+      userId:    CU.uid,
+      childId,
+      childName,
+      name,
+      email:     CU.email,
+      plan,
       paymentMethod: method,
+      transferRef: ref_,
       receiptURL,
+      type: 'parent-subscription',
       status: 'pending',
       createdAt: serverTimestamp()
     });
-    alert('✅ تم إرسال وصل الخلاص! سيتم تفعيل الاشتراك خلال 24 ساعة.');
-    $('parentChildName').value = '';
+
+    alert(`✅ تم إرسال وصل الخلاص للمنظور ${childName}!\nسيتم التفعيل خلال 24 ساعة.`);
     $('parentReceiptFile').value = '';
     $('prfn').style.display = 'none';
+    $('parentReceiptPreview').style.display = 'none';
   } catch(err) {
     alert('خطأ: ' + err.message);
   } finally {
     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال الوصل'; }
   }
+};
+
+window.previewParentReceipt = function(input) {
+  const file = input.files[0];
+  if (!file || !file.type.startsWith('image/')) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    $('parentReceiptImg').src = e.target.result;
+    $('parentReceiptPreview').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
 };
 
 // TEACHER
@@ -1065,9 +1211,17 @@ async function loadTeachersWallets(uSnap) {
 }
 
 window.toggleSub = async function(userId, current) {
-  const newStatus = current==='active'?'inactive':'active';
-  await updateDoc(doc(db,'users',userId), {subscriptionStatus:newStatus});
-  loadAdmin();
+  const newStatus = current === 'active' ? 'inactive' : 'active';
+  const action = current === 'active' ? 'إلغاء' : 'تفعيل';
+  if (!confirm(`هل تريد ${action} اشتراك هذا المستخدم؟`)) return;
+  try {
+    await updateDoc(doc(db,'users',userId), { subscriptionStatus: newStatus });
+    // إعادة تحميل المستخدمين
+    const uSnap = await getDocs(collection(db,'users'));
+    loadUsersTable(uSnap);
+  } catch(err) {
+    alert('خطأ: ' + err.message);
+  }
 };
 
 window.previewReceipt = function(id, url, userId, name, plan) {
