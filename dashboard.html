@@ -566,12 +566,24 @@
             </div>
             <div class="form-grid" style="margin-bottom:16px">
               <div class="form-group">
-                <label><i class="fas fa-file-pdf" style="color:var(--danger)"></i> رابط PDF النص</label>
-                <input type="url" class="form-control" id="vPdfText" placeholder="رابط PDF النص أو الفرض">
+                <label><i class="fas fa-file-pdf" style="color:var(--danger)"></i> ملف PDF النص</label>
+                <label class="upload-zone" for="vPdfTextFile" id="pdfTextZone" style="padding:18px">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  <p>انقر لرفع PDF النص أو الفرض</p>
+                  <input type="file" id="vPdfTextFile" accept=".pdf" onchange="handlePdfPreview(this,'pdfTextZone','pdfTextFn')">
+                </label>
+                <div id="pdfTextFn" style="font-size:.82rem;color:var(--success);margin-top:6px;display:none"></div>
+                <input type="hidden" id="vPdfText">
               </div>
               <div class="form-group">
-                <label><i class="fas fa-file-pdf" style="color:var(--success)"></i> رابط PDF الإصلاح</label>
-                <input type="url" class="form-control" id="vPdfSolution" placeholder="رابط PDF الإصلاح">
+                <label><i class="fas fa-file-pdf" style="color:var(--success)"></i> ملف PDF الإصلاح</label>
+                <label class="upload-zone" for="vPdfSolutionFile" id="pdfSolutionZone" style="padding:18px">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  <p>انقر لرفع PDF الإصلاح</p>
+                  <input type="file" id="vPdfSolutionFile" accept=".pdf" onchange="handlePdfPreview(this,'pdfSolutionZone','pdfSolutionFn')">
+                </label>
+                <div id="pdfSolutionFn" style="font-size:.82rem;color:var(--success);margin-top:6px;display:none"></div>
+                <input type="hidden" id="vPdfSolution">
               </div>
             </div>
             <div class="form-group" style="margin-bottom:16px">
@@ -1292,19 +1304,19 @@ window.filterUsers = function() {
 
 // ══ CLOUDINARY CONFIG ══
 const CLOUDINARY = {
-  cloudName:  'dv5xhvkr3',
+  cloudName   : 'dv5xhvkr3',
   uploadPreset: 'masartamayoz-content',
-  folder: 'academy/receipts'
 };
 
-async function uploadToCloudinary(file) {
+async function uploadToCloudinary(file, folder = 'receipts') {
+  const resourceType = file.type === 'application/pdf' ? 'raw' : 'image';
   const formData = new FormData();
-  formData.append('file', file);
+  formData.append('file',          file);
   formData.append('upload_preset', CLOUDINARY.uploadPreset);
-  formData.append('folder', CLOUDINARY.folder);
+  formData.append('folder',        `academy/${folder}`);
 
   const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/auto/upload`,
+    `https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/${resourceType}/upload`,
     { method: 'POST', body: formData }
   );
 
@@ -1312,6 +1324,16 @@ async function uploadToCloudinary(file) {
   const data = await res.json();
   return data.secure_url;
 }
+
+window.handlePdfPreview = function(input, zoneId, fnId) {
+  const file = input.files[0];
+  if (!file) return;
+  const zone = $(zoneId);
+  const fn   = $(fnId);
+  zone.style.borderColor = 'var(--success)';
+  fn.textContent = '✅ ' + file.name;
+  fn.style.display = 'block';
+};
 
 // FORMS
 $('receiptForm')?.addEventListener('submit', async e=>{
@@ -1372,19 +1394,71 @@ $('teacherAddSessionForm')?.addEventListener('submit', async e=>{
 
 $('addVideoForm')?.addEventListener('submit', async e=>{
   e.preventDefault();
-  const items=document.querySelectorAll('.video-item');
-  const videoUrls=[];
-  items.forEach(item=>{const url=item.querySelectorAll('input')[0].value;const title=item.querySelectorAll('input')[1].value;if(url)videoUrls.push({url,title});});
-  await addDoc(collection(db,'videos'),{
-    level:$('vLevel').value, type:$('vType').value, section:$('vSection').value,
-    title:$('vTitle').value, chapter:$('vChapter').value,
-    videoUrls, videoUrl:videoUrls[0]?.url||'',
-    pdfText:$('vPdfText').value, pdfSolution:$('vPdfSolution').value,
-    desc:$('vDesc').value, createdAt:serverTimestamp()
-  });
-  alert('✅ تم حفظ المحتوى!');
-  e.target.reset();
-  $('videoItems').innerHTML=`<div class="video-item"><input type="url" placeholder="https://www.youtube.com/watch?v=..." class="yt-input"><input type="text" placeholder="عنوان الحصة (اختياري)" style="width:200px"></div>`;
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+
+  try {
+    // روابط YouTube
+    const items = document.querySelectorAll('.video-item');
+    const videoUrls = [];
+    items.forEach(item => {
+      const url   = item.querySelectorAll('input')[0].value;
+      const title = item.querySelectorAll('input')[1].value;
+      if (url) videoUrls.push({ url, title });
+    });
+
+    // رفع PDF النص إلى Cloudinary
+    let pdfTextUrl = '';
+    const pdfTextFile = $('vPdfTextFile').files[0];
+    if (pdfTextFile) {
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري رفع PDF النص...';
+      pdfTextUrl = await uploadToCloudinary(pdfTextFile, 'pdf');
+    }
+
+    // رفع PDF الإصلاح إلى Cloudinary
+    let pdfSolutionUrl = '';
+    const pdfSolutionFile = $('vPdfSolutionFile').files[0];
+    if (pdfSolutionFile) {
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري رفع PDF الإصلاح...';
+      pdfSolutionUrl = await uploadToCloudinary(pdfSolutionFile, 'pdf');
+    }
+
+    // حفظ في Firebase
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ في قاعدة البيانات...';
+    await addDoc(collection(db,'videos'), {
+      level:    $('vLevel').value,
+      type:     $('vType').value,
+      section:  $('vSection').value,
+      title:    $('vTitle').value,
+      chapter:  $('vChapter').value,
+      videoUrls,
+      videoUrl: videoUrls[0]?.url || '',
+      pdfText:     pdfTextUrl,
+      pdfSolution: pdfSolutionUrl,
+      desc:     $('vDesc').value,
+      createdAt: serverTimestamp()
+    });
+
+    alert('✅ تم حفظ المحتوى بنجاح!');
+    e.target.reset();
+
+    // إعادة تهيئة منطقة الرفع
+    $('pdfTextZone').style.borderColor   = '';
+    $('pdfSolutionZone').style.borderColor = '';
+    $('pdfTextFn').style.display   = 'none';
+    $('pdfSolutionFn').style.display = 'none';
+    $('videoItems').innerHTML = `<div class="video-item">
+      <input type="url" placeholder="https://www.youtube.com/watch?v=..." class="yt-input">
+      <input type="text" placeholder="عنوان الحصة (اختياري)" style="width:200px">
+    </div>`;
+
+  } catch(err) {
+    alert('خطأ: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-save"></i> حفظ المحتوى';
+  }
 });
 
 $('addSessionForm')?.addEventListener('submit', async e=>{
