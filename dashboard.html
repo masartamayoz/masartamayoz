@@ -898,12 +898,11 @@ let CU = null, CUD = null, currentReceiptId = null, currentSessionId = null;
 // ══ CLOUDINARY ══
 const CLOUDINARY = { cloudName:'dv5xhvkr3', uploadPreset:'masartamayoz-content' };
 async function uploadToCloudinary(file, folder='receipts') {
-  const resourceType = file.type==='application/pdf' ? 'raw' : 'image';
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', CLOUDINARY.uploadPreset);
   formData.append('folder', `academy/${folder}`);
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/${resourceType}/upload`,{method:'POST',body:formData});
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/auto/upload`,{method:'POST',body:formData});
   if (!res.ok) throw new Error('فشل رفع الملف');
   return (await res.json()).secure_url;
 }
