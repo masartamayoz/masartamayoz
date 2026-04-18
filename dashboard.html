@@ -153,38 +153,58 @@
     .empty-state i{font-size:2.8rem;color:var(--gray-200);margin-bottom:14px;display:block}
     .empty-state h3{font-size:1rem;font-weight:700;color:var(--gray-600);margin-bottom:6px}
     .empty-state p{font-size:.85rem;color:var(--gray-400)}
-    @media(max-width:768px){
-      .sidebar{transform:translateX(100%)}
-      .sidebar.open{transform:translateX(0)}
-      .main-content{margin-right:0}
-      .hamburger-btn{display:block}
-      .form-grid{grid-template-columns:1fr}
-      .form-grid.cols3{grid-template-columns:1fr}
-      .stats-grid{grid-template-columns:repeat(2,1fr)}
-      .wallet-grid{grid-template-columns:1fr 1fr}
-      .plan-cards{grid-template-columns:1fr}
-      .page{padding:16px}
-    }
 
-    /* ══════ TOAST ══════ */
-    #toastContainer{position:fixed;bottom:24px;left:24px;z-index:99999;display:flex;flex-direction:column;gap:10px}
-    .toast{display:flex;align-items:center;gap:10px;padding:12px 18px;border-radius:12px;font-size:.88rem;font-weight:600;color:white;box-shadow:0 4px 20px rgba(0,0,0,.15);animation:toastIn .3s ease;min-width:240px;max-width:340px}
-    @keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    /* ══ TOAST ══ */
+    #toastContainer{position:fixed;bottom:24px;left:24px;z-index:99999;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+    .toast{display:flex;align-items:center;gap:10px;padding:12px 18px;border-radius:12px;font-size:.88rem;font-weight:600;color:white;box-shadow:0 4px 20px rgba(0,0,0,.2);animation:toastIn .3s ease;min-width:240px;max-width:320px;pointer-events:all}
+    @keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
     .toast-success{background:var(--success)}
     .toast-danger{background:var(--danger)}
     .toast-warning{background:var(--warning);color:var(--blue-dark)}
     .toast-info{background:var(--blue-light)}
 
-    /* ══════ USERS TABLE ══════ */
+    /* ══ USERS TABLE ══ */
     .users-filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
     .users-filter-btn{padding:6px 14px;border-radius:20px;border:1.5px solid var(--gray-200);background:white;font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;color:var(--gray-600)}
     .users-filter-btn.active{background:var(--blue-light);color:white;border-color:var(--blue-light)}
     .user-avatar-sm{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0}
 
-    /* ══════ EDIT CONTENT ══════ */
+    /* ══ CONTENT LIST ══ */
     .content-list-item{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;flex-wrap:wrap}
     .content-item-info h4{font-size:.9rem;font-weight:700;color:var(--blue-dark)}
     .content-item-info p{font-size:.78rem;color:var(--gray-600);margin-top:2px}
+
+    /* ══ RESPONSIVE ══ */
+    @media(max-width:768px){
+      .sidebar{transform:translateX(100%)}
+      .sidebar.open{transform:translateX(0)}
+      .main-content{margin-right:0}
+      .hamburger-btn{display:block}
+      .form-grid{grid-template-columns:1fr!important}
+      .form-grid.cols3{grid-template-columns:1fr!important}
+      .stats-grid{grid-template-columns:repeat(2,1fr)}
+      .wallet-grid{grid-template-columns:1fr 1fr}
+      .plan-cards{grid-template-columns:1fr}
+      .page{padding:12px}
+      .card{padding:16px}
+      .admin-tabs{flex-wrap:wrap;gap:6px}
+      .admin-tab{font-size:.78rem;padding:7px 12px}
+      .topbar{padding:12px 16px}
+      .topbar-title h1{font-size:1rem}
+      table{font-size:.8rem}
+      th,td{padding:8px 10px}
+      .stat-card{padding:14px}
+      .stat-info strong{font-size:1.3rem}
+      .users-filter-bar{gap:6px}
+      .users-filter-btn{font-size:.75rem;padding:5px 10px}
+      #toastContainer{bottom:16px;left:16px;right:16px}
+      .toast{min-width:unset;width:100%}
+    }
+    @media(max-width:480px){
+      .stats-grid{grid-template-columns:1fr 1fr}
+      .wallet-grid{grid-template-columns:1fr}
+      .sidebar-logo h2{font-size:.85rem}
+    }
   </style>
 </head>
 <body>
@@ -326,6 +346,17 @@
           <button class="btn btn-primary btn-sm" onclick="showPage('parent-link')"><i class="fas fa-link"></i> ربط منظور</button>
         </div>
         <div id="parentChildrenList"></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fas fa-receipt"></i> سجل الوصولات</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>المنظور</th><th>العرض</th><th>طريقة الدفع</th><th>التاريخ</th><th>الحالة</th></tr></thead>
+            <tbody id="parentReceiptsHistory"><tr><td colspan="5" style="text-align:center;padding:24px;color:var(--gray-400)">لا توجد وصولات بعد</td></tr></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -480,7 +511,6 @@
           <div class="card-title"><i class="fas fa-users"></i> إدارة المستخدمين</div>
           <input type="text" class="form-control" placeholder="بحث بالاسم أو البريد..." id="userSearch" style="width:220px" oninput="filterUsers()">
         </div>
-        <!-- فلاتر الأدوار -->
         <div class="users-filter-bar">
           <span style="font-size:.82rem;color:var(--gray-600);font-weight:600">تصفية:</span>
           <button class="users-filter-btn active" onclick="filterByRole('all',this)">الكل</button>
@@ -527,12 +557,13 @@
       <div class="card">
         <div class="card-title" style="margin-bottom:20px"><i class="fas fa-plus-circle"></i> إدارة المحتوى</div>
         <div class="admin-tabs">
-          <button class="admin-tab active" onclick="switchAdminTab('video',this)">📹 إضافة درس/محتوى</button>
+          <button class="admin-tab active" onclick="switchAdminTab('video',this)">📹 إضافة محتوى</button>
           <button class="admin-tab" onclick="switchAdminTab('edit',this)">✏️ تعديل المحتوى</button>
           <button class="admin-tab" onclick="switchAdminTab('session',this)">📅 جدولة حصة</button>
           <button class="admin-tab" onclick="switchAdminTab('teacher',this)">👤 إضافة مدرس</button>
         </div>
- <div class="admin-panel active" id="panel-video">
+
+        <div class="admin-panel active" id="panel-video">
           <form id="addVideoForm">
             <div class="form-grid cols3" style="margin-bottom:16px">
               <div class="form-group">
@@ -596,12 +627,24 @@
             </div>
             <div class="form-grid" style="margin-bottom:16px">
               <div class="form-group">
-                <label><i class="fas fa-file-pdf" style="color:var(--danger)"></i> رابط PDF النص</label>
-                <input type="url" class="form-control" id="vPdfText" placeholder="رابط PDF النص أو الفرض">
+                <label><i class="fas fa-file-pdf" style="color:var(--danger)"></i> ملف PDF النص</label>
+                <label class="upload-zone" for="vPdfTextFile" id="pdfTextZone" style="padding:18px">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  <p>انقر لرفع PDF النص أو الفرض</p>
+                  <input type="file" id="vPdfTextFile" accept=".pdf" onchange="handlePdfPreview(this,'pdfTextZone','pdfTextFn')">
+                </label>
+                <div id="pdfTextFn" style="font-size:.82rem;color:var(--success);margin-top:6px;display:none"></div>
+                <input type="hidden" id="vPdfText">
               </div>
               <div class="form-group">
-                <label><i class="fas fa-file-pdf" style="color:var(--success)"></i> رابط PDF الإصلاح</label>
-                <input type="url" class="form-control" id="vPdfSolution" placeholder="رابط PDF الإصلاح">
+                <label><i class="fas fa-file-pdf" style="color:var(--success)"></i> ملف PDF الإصلاح</label>
+                <label class="upload-zone" for="vPdfSolutionFile" id="pdfSolutionZone" style="padding:18px">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  <p>انقر لرفع PDF الإصلاح</p>
+                  <input type="file" id="vPdfSolutionFile" accept=".pdf" onchange="handlePdfPreview(this,'pdfSolutionZone','pdfSolutionFn')">
+                </label>
+                <div id="pdfSolutionFn" style="font-size:.82rem;color:var(--success);margin-top:6px;display:none"></div>
+                <input type="hidden" id="vPdfSolution">
               </div>
             </div>
             <div class="form-group" style="margin-bottom:16px">
@@ -612,35 +655,7 @@
           </form>
         </div>
 
-
-        <div class="admin-panel" id="panel-edit">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px">
-            <div class="form-grid" style="flex:1;min-width:260px;margin:0">
-              <div class="form-group" style="margin:0">
-                <select class="form-control" id="editFilterLevel" onchange="loadContentList()">
-                  <option value="">كل المستويات</option>
-                  <option value="7">السنة السابعة</option>
-                  <option value="8">السنة الثامنة</option>
-                  <option value="9">السنة التاسعة</option>
-                </select>
-              </div>
-              <div class="form-group" style="margin:0">
-                <select class="form-control" id="editFilterType" onchange="loadContentList()">
-                  <option value="">كل الأنواع</option>
-                  <option value="lesson">دروس</option>
-                  <option value="exercise">سلاسل تمارين</option>
-                  <option value="exam1">فرض مراقبة 1</option>
-                  <option value="exam2">فرض مراقبة 2</option>
-                  <option value="exam3">فرض مراقبة 3</option>
-                  <option value="final1">فرض تأليفي 1</option>
-                  <option value="final2">فرض تأليفي 2</option>
-                  <option value="final3">فرض تأليفي 3</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div id="contentEditList"><div class="empty-state"><i class="fas fa-list"></i><h3>اختر مستوى أو نوعاً لعرض المحتوى</h3></div></div>
-        </div>
+        <div class="admin-panel" id="panel-session">
           <form id="addSessionForm">
             <div class="form-grid" style="margin-bottom:16px">
               <div class="form-group">
@@ -690,6 +705,33 @@
             </div>
             <button type="submit" class="btn btn-primary"><i class="fas fa-user-plus"></i> إضافة المدرس</button>
           </form>
+        </div>
+
+        <div class="admin-panel" id="panel-edit">
+          <div class="form-grid" style="margin-bottom:16px">
+            <div class="form-group">
+              <select class="form-control" id="editFilterLevel" onchange="loadContentList()">
+                <option value="">كل المستويات</option>
+                <option value="7">السنة السابعة</option>
+                <option value="8">السنة الثامنة</option>
+                <option value="9">السنة التاسعة</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <select class="form-control" id="editFilterType" onchange="loadContentList()">
+                <option value="">كل الأنواع</option>
+                <option value="lesson">دروس</option>
+                <option value="exercise">سلاسل تمارين</option>
+                <option value="exam1">فرض مراقبة 1</option>
+                <option value="exam2">فرض مراقبة 2</option>
+                <option value="exam3">فرض مراقبة 3</option>
+                <option value="final1">فرض تأليفي 1</option>
+                <option value="final2">فرض تأليفي 2</option>
+                <option value="final3">فرض تأليفي 3</option>
+              </select>
+            </div>
+          </div>
+          <div id="contentEditList"><div class="empty-state"><i class="fas fa-list"></i><h3>اختر مستوى أو نوعاً لعرض المحتوى</h3></div></div>
         </div>
       </div>
     </div>
@@ -771,84 +813,57 @@
   <div class="modal-box" style="max-width:640px">
     <button class="modal-close" onclick="document.getElementById('editContentModal').classList.remove('open')"><i class="fas fa-times"></i></button>
     <div class="modal-title">✏️ تعديل المحتوى</div>
-    <div class="modal-subtitle">تعديل بيانات الدرس أو تحديث ملفاته</div>
     <input type="hidden" id="editContentId">
     <div class="form-grid cols3" style="margin-bottom:16px">
-      <div class="form-group">
-        <label>المستوى</label>
+      <div class="form-group"><label>المستوى</label>
         <select class="form-control" id="editVLevel">
-          <option value="7">السنة السابعة</option>
-          <option value="8">السنة الثامنة</option>
-          <option value="9">السنة التاسعة</option>
+          <option value="7">السنة السابعة</option><option value="8">السنة الثامنة</option><option value="9">السنة التاسعة</option>
         </select>
       </div>
-      <div class="form-group">
-        <label>النوع</label>
+      <div class="form-group"><label>النوع</label>
         <select class="form-control" id="editVType">
-          <option value="lesson">درس</option>
-          <option value="exercise">سلسلة تمارين</option>
-          <option value="exam1">فرض مراقبة 1</option>
-          <option value="exam2">فرض مراقبة 2</option>
-          <option value="exam3">فرض مراقبة 3</option>
-          <option value="final1">فرض تأليفي 1</option>
-          <option value="final2">فرض تأليفي 2</option>
-          <option value="final3">فرض تأليفي 3</option>
+          <option value="lesson">درس</option><option value="exercise">سلسلة تمارين</option>
+          <option value="exam1">فرض م.1</option><option value="exam2">فرض م.2</option><option value="exam3">فرض م.3</option>
+          <option value="final1">فرض ت.1</option><option value="final2">فرض ت.2</option><option value="final3">فرض ت.3</option>
         </select>
       </div>
-      <div class="form-group">
-        <label>القسم</label>
+      <div class="form-group"><label>القسم</label>
         <select class="form-control" id="editVSection">
-          <option value="">اختر</option>
-          <option value="algebra">جبر</option>
-          <option value="geometry">هندسة</option>
-          <option value="statistics">إحصاء</option>
-          <option value="general">عام</option>
+          <option value="">—</option><option value="algebra">جبر</option><option value="geometry">هندسة</option>
+          <option value="statistics">إحصاء</option><option value="general">عام</option>
         </select>
       </div>
     </div>
     <div class="form-grid" style="margin-bottom:16px">
-      <div class="form-group">
-        <label>عنوان الدرس *</label>
-        <input type="text" class="form-control" id="editVTitle" required>
-      </div>
-      <div class="form-group">
-        <label>الوحدة / الفصل</label>
-        <input type="text" class="form-control" id="editVChapter">
-      </div>
+      <div class="form-group"><label>عنوان الدرس *</label><input type="text" class="form-control" id="editVTitle"></div>
+      <div class="form-group"><label>الوحدة / الفصل</label><input type="text" class="form-control" id="editVChapter"></div>
     </div>
     <div class="form-group" style="margin-bottom:16px">
       <label>روابط YouTube</label>
       <div id="editVideoItems" class="video-items"></div>
-      <button type="button" class="btn btn-outline btn-sm" style="margin-top:8px" onclick="addEditVideoItem()">
-        <i class="fas fa-plus"></i> إضافة رابط آخر
-      </button>
+      <button type="button" class="btn btn-outline btn-sm" style="margin-top:8px" onclick="addEditVideoItem()"><i class="fas fa-plus"></i> إضافة رابط</button>
     </div>
     <div class="form-grid" style="margin-bottom:16px">
       <div class="form-group">
-        <label><i class="fas fa-file-pdf" style="color:var(--danger)"></i> PDF النص الحالي</label>
-        <div id="editPdfTextCurrent" style="font-size:.82rem;color:var(--gray-600);margin-bottom:6px"></div>
+        <label><i class="fas fa-file-pdf" style="color:var(--danger)"></i> PDF النص</label>
+        <div id="editPdfTextCurrent" style="font-size:.8rem;margin-bottom:6px"></div>
         <label class="upload-zone" for="editPdfTextFile" id="editPdfTextZone" style="padding:14px">
-          <i class="fas fa-cloud-upload-alt"></i>
-          <p style="font-size:.82rem">رفع ملف جديد (اختياري)</p>
+          <i class="fas fa-cloud-upload-alt"></i><p style="font-size:.82rem">رفع ملف جديد</p>
           <input type="file" id="editPdfTextFile" accept=".pdf" onchange="handlePdfPreview(this,'editPdfTextZone','editPdfTextFn')">
         </label>
         <div id="editPdfTextFn" style="font-size:.82rem;color:var(--success);margin-top:4px;display:none"></div>
       </div>
       <div class="form-group">
-        <label><i class="fas fa-file-pdf" style="color:var(--success)"></i> PDF الإصلاح الحالي</label>
-        <div id="editPdfSolCurrent" style="font-size:.82rem;color:var(--gray-600);margin-bottom:6px"></div>
+        <label><i class="fas fa-file-pdf" style="color:var(--success)"></i> PDF الإصلاح</label>
+        <div id="editPdfSolCurrent" style="font-size:.8rem;margin-bottom:6px"></div>
         <label class="upload-zone" for="editPdfSolFile" id="editPdfSolZone" style="padding:14px">
-          <i class="fas fa-cloud-upload-alt"></i>
-          <p style="font-size:.82rem">رفع ملف جديد (اختياري)</p>
+          <i class="fas fa-cloud-upload-alt"></i><p style="font-size:.82rem">رفع ملف جديد</p>
           <input type="file" id="editPdfSolFile" accept=".pdf" onchange="handlePdfPreview(this,'editPdfSolZone','editPdfSolFn')">
         </label>
         <div id="editPdfSolFn" style="font-size:.82rem;color:var(--success);margin-top:4px;display:none"></div>
       </div>
     </div>
-    <div class="form-group" style="margin-bottom:20px">
-      <label>وصف الدرس</label>
-      <textarea class="form-control" id="editVDesc"></textarea>
-    </div>
+    <div class="form-group" style="margin-bottom:20px"><label>وصف</label><textarea class="form-control" id="editVDesc"></textarea></div>
     <div style="display:flex;gap:10px">
       <button class="btn btn-primary" style="flex:1" onclick="saveEditContent()"><i class="fas fa-save"></i> حفظ التعديلات</button>
       <button class="btn btn-danger-outline" onclick="deleteContent()"><i class="fas fa-trash"></i> حذف</button>
@@ -1036,16 +1051,21 @@ async function loadParent() {
       }
     }
 
-    // عرض قائمة المنظورين
+    // عرض قائمة المنظورين — الاسم واللقب بدل الـ email
     $('parentChildrenList').innerHTML = children.length ? children.map(c => {
-      const name = c.childData.firstName ? `${c.childData.firstName} ${c.childData.lastName||''}` : (c.childName||'—');
+      const name = c.childData.firstName ? `${c.childData.firstName} ${c.childData.lastName||''}`.trim() : (c.childName||'—');
+      const initial = name.charAt(0).toUpperCase();
+      const level = c.childData.level ? `السنة ${c.childData.level}` : '—';
       return `
         <div class="child-card">
-          <div class="child-info">
-            <h4><i class="fas fa-user-graduate" style="color:var(--blue-light)"></i> ${name}</h4>
-            <p>السنة ${c.childData.level||'—'} • ${c.childEmail} • ${subBadge(c.childData.subscriptionStatus)}</p>
+          <div class="child-info" style="display:flex;align-items:center;gap:12px">
+            <div style="width:42px;height:42px;border-radius:50%;background:rgba(16,185,129,.12);color:#059669;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;flex-shrink:0">${initial}</div>
+            <div>
+              <h4 style="font-size:.95rem;font-weight:800;color:var(--blue-dark)">${name}</h4>
+              <p style="font-size:.8rem;color:var(--gray-600);margin-top:2px">${level} • ${subBadge(c.childData.subscriptionStatus||'inactive')}</p>
+            </div>
           </div>
-          <div style="display:flex;gap:8px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-outline btn-sm" onclick="showPage('parent-subscription')">
               <i class="fas fa-credit-card"></i> اشتراك
             </button>
@@ -1069,13 +1089,16 @@ async function loadParent() {
     if (sel) {
       sel.innerHTML = '<option value="">اختر المنظور</option>';
       children.forEach(c => {
-        const name = c.childData.firstName ? `${c.childData.firstName} ${c.childData.lastName||''}` : (c.childName||c.childEmail);
+        const name = c.childData.firstName ? `${c.childData.firstName} ${c.childData.lastName||''}`.trim() : (c.childName||c.childEmail);
         const opt = document.createElement('option');
         opt.value = c.childId;
         opt.textContent = name;
         sel.appendChild(opt);
       });
     }
+
+    // سجل الوصولات
+    loadParentReceiptsHistory();
 
   } catch(err) {
     $('parentChildrenList').innerHTML = `
@@ -1227,7 +1250,7 @@ window.submitParentReceipt = async function() {
       createdAt: serverTimestamp()
     });
 
-    toast(`تم إرسال وصل الخلاص للمنظور ${childName}!`,'success');
+    toast(`تم إرسال وصل الخلاص للمنظور ${childName}! سيتم التفعيل خلال 24 ساعة`,'success');
     $('parentReceiptFile').value = '';
     $('prfn').style.display = 'none';
     $('parentReceiptPreview').style.display = 'none';
@@ -1311,73 +1334,19 @@ async function loadAdmin() {
   uSnap.forEach(d=>{const u=d.data();if(u.userType==='teacher'){const o=document.createElement('option');o.value=d.id;o.textContent=u.firstName?`${u.firstName} ${u.lastName||''}`:(u.name||'');tSel.appendChild(o);}});
 }
 
-let allUsersData = [];
-
 function loadUsersTable(uSnap) {
-  allUsersData = [];
-  uSnap.forEach(d => allUsersData.push({id:d.id,...d.data()}));
-  renderUsersTable(allUsersData);
-}
-
-function renderUsersTable(users) {
-  $('usersCount').textContent = `${users.length} مستخدم`;
-  const roleColors = {
-    student: {bg:'rgba(16,185,129,.12)',color:'#059669',icon:'fa-user-graduate'},
-    parent:  {bg:'rgba(37,99,235,.12)', color:'var(--blue-light)',icon:'fa-user-friends'},
-    teacher: {bg:'rgba(245,158,11,.12)',color:'#d97706',icon:'fa-chalkboard-teacher'},
-    admin:   {bg:'rgba(239,68,68,.12)', color:'#dc2626',icon:'fa-user-shield'},
-  };
-  const rows = users.map(u => {
-    const name = u.firstName ? `${u.firstName} ${u.lastName||''}`.trim() : (u.name||'—');
-    const initial = name.charAt(0).toUpperCase();
-    const rc = roleColors[u.userType] || {bg:'rgba(148,163,184,.12)',color:'var(--gray-600)',icon:'fa-user'};
-    const avatarBg = u.userType==='student'?'#10b981':u.userType==='parent'?'#2563eb':u.userType==='teacher'?'#f59e0b':'#ef4444';
-    return `<tr>
-      <td>
-        <div style="display:flex;align-items:center;gap:10px">
-          <div class="user-avatar-sm" style="background:${avatarBg}20;color:${avatarBg}">${initial}</div>
-          <div>
-            <div style="font-weight:700;font-size:.88rem">${name}</div>
-            <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:.72rem;font-weight:700;background:${rc.bg};color:${rc.color}">
-              <i class="fas ${rc.icon}" style="font-size:.65rem"></i> ${ROLES[u.userType]||u.userType||'—'}
-            </span>
-          </div>
-        </div>
-      </td>
-      <td style="font-size:.82rem;color:var(--gray-600)">${u.email||'—'}</td>
+  const rows=[];
+  uSnap.forEach(d=>{const u=d.data();const name=u.firstName?`${u.firstName} ${u.lastName||''}`:(u.name||'—');
+    rows.push(`<tr>
+      <td><strong>${name}</strong></td><td style="font-size:.82rem">${u.email||'—'}</td>
       <td style="font-size:.82rem">${u.phone||'—'}</td>
-      <td>${u.level?`<span class="badge badge-info">السنة ${u.level}</span>`:'—'}</td>
-      <td>${subBadge(u.subscriptionStatus)}</td>
-      <td>
-        <button class="btn btn-sm ${u.subscriptionStatus==='active'?'btn-danger-outline':'btn-success'}" onclick="toggleSub('${u.id}','${u.subscriptionStatus}')">
-          ${u.subscriptionStatus==='active'?'<i class="fas fa-ban"></i> إلغاء':'<i class="fas fa-check"></i> تفعيل'}
-        </button>
-      </td>
-    </tr>`;
-  });
-  $('usersTable').innerHTML = rows.join('') || `<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--gray-400)">لا يوجد مستخدمون</td></tr>`;
-}
-
-let _currentRoleFilter = 'all';
-
-window.filterByRole = function(role, btn) {
-  _currentRoleFilter = role;
-  document.querySelectorAll('.users-filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  applyUsersFilter();
-};
-
-window.filterUsers = function() { applyUsersFilter(); };
-
-function applyUsersFilter() {
-  const q = ($('userSearch')?.value||'').toLowerCase().trim();
-  let filtered = allUsersData;
-  if (_currentRoleFilter !== 'all') filtered = filtered.filter(u => u.userType === _currentRoleFilter);
-  if (q) filtered = filtered.filter(u => {
-    const name = u.firstName ? `${u.firstName} ${u.lastName||''}` : (u.name||'');
-    return name.toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q);
-  });
-  renderUsersTable(filtered);
+      <td><span style="font-size:.78rem;font-weight:700">${ROLES[u.userType]||u.userType||'—'}</span></td>
+      <td>${u.level?`السنة ${u.level}`:'—'}</td><td>${subBadge(u.subscriptionStatus)}</td>
+      <td><button class="btn btn-sm ${u.subscriptionStatus==='active'?'btn-danger-outline':'btn-success'}" onclick="toggleSub('${d.id}','${u.subscriptionStatus}')">
+        ${u.subscriptionStatus==='active'?'إلغاء':'تفعيل'}
+      </button></td>
+    </tr>`);});
+  $('usersTable').innerHTML=rows.join('')||`<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--gray-400)">لا يوجد مستخدمون</td></tr>`;
 }
 
 async function loadAdminSessions() {
@@ -1490,40 +1459,6 @@ window.payTeacher = async function(teacherId, name, balance) {
 };
 
 
-// ══ TOAST ══
-function toast(msg, type='info') {
-  const c = document.getElementById('toastContainer');
-  const t = document.createElement('div');
-  t.className = `toast toast-${type}`;
-  const icons = {success:'check-circle',danger:'exclamation-circle',warning:'exclamation-triangle',info:'info-circle'};
-  t.innerHTML = `<i class="fas fa-${icons[type]||'info-circle'}"></i> ${msg}`;
-  c.appendChild(t);
-  setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(()=>t.remove(),300); }, 3200);
-}
-
-// ══ CLOUDINARY CONFIG ══
-const CLOUDINARY = {
-  cloudName:  'dv5xhvkr3',
-  uploadPreset: 'masartamayoz-content',
-  folder: 'academy/receipts'
-};
-
-async function uploadToCloudinary(file) {
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', CLOUDINARY.uploadPreset);
-  formData.append('folder', CLOUDINARY.folder);
-
-  const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/auto/upload`,
-    { method: 'POST', body: formData }
-  );
-
-  if (!res.ok) throw new Error('فشل رفع الملف على Cloudinary');
-  const data = await res.json();
-  return data.secure_url;
-}
-
 // FORMS
 $('receiptForm')?.addEventListener('submit', async e=>{
   e.preventDefault();
@@ -1553,9 +1488,10 @@ $('receiptForm')?.addEventListener('submit', async e=>{
     });
     await updateDoc(doc(db,'users',CU.uid), { subscriptionStatus: 'pending' });
 
-    toast('تم إرسال وصل الخلاص بنجاح! سيتم التفعيل خلال 24 ساعة','success');
+    toast('تم إرسال الوصل! سيتم التفعيل خلال 24 ساعة','success');
     e.target.reset();
     $('rfn').style.display = 'none';
+    toast('تم إرسال الوصل بنجاح! سيتم التفعيل خلال 24 ساعة','success');
   } catch(err) {
     toast('خطأ: ' + err.message,'danger');
   } finally {
@@ -1576,6 +1512,7 @@ $('teacherAddSessionForm')?.addEventListener('submit', async e=>{
     status:'pending', createdAt:serverTimestamp()
   });
   toast('تم تسجيل الحصة! في انتظار مراجعة الإدارة','success');
+  toast('تم تسجيل الحصة! في انتظار مراجعة الإدارة','success');
   $('addSessionModal').classList.remove('open');
   e.target.reset();
   loadTeacher();
@@ -1583,19 +1520,36 @@ $('teacherAddSessionForm')?.addEventListener('submit', async e=>{
 
 $('addVideoForm')?.addEventListener('submit', async e=>{
   e.preventDefault();
-  const items=document.querySelectorAll('.video-item');
-  const videoUrls=[];
-  items.forEach(item=>{const url=item.querySelectorAll('input')[0].value;const title=item.querySelectorAll('input')[1].value;if(url)videoUrls.push({url,title});});
-  await addDoc(collection(db,'videos'),{
-    level:$('vLevel').value, type:$('vType').value, section:$('vSection').value,
-    title:$('vTitle').value, chapter:$('vChapter').value,
-    videoUrls, videoUrl:videoUrls[0]?.url||'',
-    pdfText:$('vPdfText').value, pdfSolution:$('vPdfSolution').value,
-    desc:$('vDesc').value, createdAt:serverTimestamp()
-  });
-  toast('تم حفظ المحتوى بنجاح!','success');
-  e.target.reset();
-  $('videoItems').innerHTML=`<div class="video-item"><input type="url" placeholder="https://www.youtube.com/watch?v=..." class="yt-input"><input type="text" placeholder="عنوان الحصة (اختياري)" style="width:200px"></div>`;
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+  try {
+    const items = document.querySelectorAll('.video-item');
+    const videoUrls = [];
+    items.forEach(item => {
+      const url = item.querySelectorAll('input')[0].value;
+      const title = item.querySelectorAll('input')[1].value;
+      if (url) videoUrls.push({url, title});
+    });
+    let pdfTextUrl = '', pdfSolUrl = '';
+    const pdfTF = $('vPdfTextFile')?.files[0];
+    const pdfSF = $('vPdfSolutionFile')?.files[0];
+    if (pdfTF) { btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> جاري رفع PDF النص...';      pdfTextUrl = await uploadToCloudinary(pdfTF,'pdf'); }
+    if (pdfSF) { btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> جاري رفع PDF الإصلاح...';   pdfSolUrl  = await uploadToCloudinary(pdfSF,'pdf'); }
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ في قاعدة البيانات...';
+    await addDoc(collection(db,'videos'),{
+      level:$('vLevel').value, type:$('vType').value, section:$('vSection').value,
+      title:$('vTitle').value, chapter:$('vChapter').value,
+      videoUrls, videoUrl:videoUrls[0]?.url||'',
+      pdfText: pdfTextUrl, pdfSolution: pdfSolUrl,
+      desc:$('vDesc').value, createdAt:serverTimestamp()
+    });
+    toast('تم حفظ المحتوى بنجاح!','success');
+    e.target.reset();
+    ['pdfTextZone','pdfSolutionZone'].forEach(id=>{ if($(id)) $(id).style.borderColor=''; });
+    ['pdfTextFn','pdfSolutionFn'].forEach(id=>{ if($(id)) $(id).style.display='none'; });
+    $('videoItems').innerHTML=`<div class="video-item"><input type="url" placeholder="https://www.youtube.com/watch?v=..." class="yt-input"><input type="text" placeholder="عنوان الحصة (اختياري)" style="width:200px"></div>`;
+  } catch(err) { toast('خطأ: '+err.message,'danger'); }
+  finally { btn.disabled=false; btn.innerHTML='<i class="fas fa-save"></i> حفظ المحتوى'; }
 });
 
 $('addSessionForm')?.addEventListener('submit', async e=>{
@@ -1626,156 +1580,52 @@ $('addTeacherForm')?.addEventListener('submit', async e=>{
   } finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-user-plus"></i> إضافة المدرس';}
 });
 
-// ══ CONTENT EDIT HELPERS ══
+// ══ CLOUDINARY ══
+const CLOUDINARY = { cloudName:'dv5xhvkr3', uploadPreset:'masartamayoz-content' };
+async function uploadToCloudinary(file, folder='receipts') {
+  const resourceType = file.type==='application/pdf' ? 'raw' : 'image';
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY.uploadPreset);
+  formData.append('folder', `academy/${folder}`);
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/${resourceType}/upload`,{method:'POST',body:formData});
+  if (!res.ok) throw new Error('فشل رفع الملف');
+  return (await res.json()).secure_url;
+}
+
+// ══ TOAST ══
+function toast(msg, type='info') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  const icons = {success:'check-circle',danger:'exclamation-circle',warning:'exclamation-triangle',info:'info-circle'};
+  t.innerHTML = `<i class="fas fa-${icons[type]||'info-circle'}"></i> ${msg}`;
+  c.appendChild(t);
+  setTimeout(()=>{ t.style.cssText='opacity:0;transition:opacity .3s'; setTimeout(()=>t.remove(),300); }, 3200);
+}
+
+// ══ HELPERS ══
 window.handlePdfPreview = function(input, zoneId, fnId) {
-  const file = input.files[0];
-  if (!file) return;
+  const file = input.files[0]; if (!file) return;
   $(zoneId).style.borderColor = 'var(--success)';
-  $(fnId).textContent = '✅ ' + file.name;
-  $(fnId).style.display = 'block';
+  $(fnId).textContent = '✅ ' + file.name; $(fnId).style.display = 'block';
 };
 
-window.loadContentList = async function() {
-  const level = $('editFilterLevel').value;
-  const type  = $('editFilterType').value;
-  const list  = $('contentEditList');
-  list.innerHTML = `<div class="empty-state"><i class="fas fa-spinner fa-spin"></i><h3>جاري التحميل...</h3></div>`;
-  try {
-    const filters = [];
-    if (level) filters.push(where('level','==',level));
-    if (type)  filters.push(where('type','==',type));
-    const snap = await getDocs(filters.length ? query(collection(db,'videos'),...filters) : collection(db,'videos'));
-    if (snap.empty) { list.innerHTML=`<div class="empty-state"><i class="fas fa-folder-open"></i><h3>لا يوجد محتوى</h3></div>`; return; }
-    const rows = [];
-    snap.forEach(d => {
-      const v = d.data();
-      const vCount = v.videoUrls?.length || (v.videoUrl?1:0);
-      rows.push(`
-        <div class="content-list-item">
-          <div class="content-item-info" style="flex:1;min-width:0">
-            <h4>${v.title||'—'}</h4>
-            <p>السنة ${v.level} • ${TYPES[v.type]||v.type||'—'} ${v.chapter?'• '+v.chapter:''} ${v.section?'• '+(SECTIONS[v.section]||v.section):''}</p>
-            <p style="margin-top:4px">
-              ${vCount?`<span style="color:var(--blue-light);font-size:.78rem"><i class="fas fa-video"></i> ${vCount} فيديو</span> `:''}
-              ${v.pdfText?`<span style="color:var(--danger);font-size:.78rem"><i class="fas fa-file-pdf"></i> نص </span>`:''}
-              ${v.pdfSolution?`<span style="color:var(--success);font-size:.78rem"><i class="fas fa-file-pdf"></i> إصلاح</span>`:''}
-            </p>
-          </div>
-          <button class="btn btn-outline btn-sm" onclick="openEditContent('${d.id}')"><i class="fas fa-edit"></i> تعديل</button>
-        </div>`);
-    });
-    list.innerHTML = rows.join('');
-  } catch(e) { list.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i><h3>خطأ: ${e.message}</h3></div>`; }
-};
-
-window.openEditContent = async function(id) {
-  try {
-    const snap = await getDoc(doc(db,'videos',id));
-    if (!snap.exists()) return;
-    const v = snap.data();
-    $('editContentId').value  = id;
-    $('editVLevel').value     = v.level   || '7';
-    $('editVType').value      = v.type    || 'lesson';
-    $('editVSection').value   = v.section || '';
-    $('editVTitle').value     = v.title   || '';
-    $('editVChapter').value   = v.chapter || '';
-    $('editVDesc').value      = v.desc    || '';
-    const videos = v.videoUrls?.length ? v.videoUrls : (v.videoUrl?[{url:v.videoUrl,title:''}]:[]);
-    $('editVideoItems').innerHTML = videos.map((vv,i) => `
-      <div class="video-item">
-        <input type="url" value="${vv.url||''}" placeholder="https://..." class="yt-input">
-        <input type="text" value="${vv.title||''}" placeholder="عنوان الحصة" style="width:180px">
-        ${i>0?`<button type="button" class="btn-remove-video" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`:''}
-      </div>`).join('') || `<div class="video-item"><input type="url" placeholder="https://..." class="yt-input"><input type="text" placeholder="عنوان الحصة" style="width:180px"></div>`;
-    $('editPdfTextCurrent').innerHTML  = v.pdfText     ? `<a href="${v.pdfText}"     target="_blank" style="color:var(--danger);font-size:.8rem"><i class="fas fa-file-pdf"></i> عرض الملف الحالي</a>` : '<span style="color:var(--gray-400);font-size:.8rem">لا يوجد</span>';
-    $('editPdfSolCurrent').innerHTML   = v.pdfSolution ? `<a href="${v.pdfSolution}" target="_blank" style="color:var(--success);font-size:.8rem"><i class="fas fa-file-pdf"></i> عرض الملف الحالي</a>` : '<span style="color:var(--gray-400);font-size:.8rem">لا يوجد</span>';
-    ['editPdfTextFn','editPdfSolFn'].forEach(id=>{ $(id).style.display='none'; });
-    ['editPdfTextZone','editPdfSolZone'].forEach(id=>{ $(id).style.borderColor=''; });
-    $('editPdfTextFile').value = '';
-    $('editPdfSolFile').value  = '';
-    $('editContentModal').classList.add('open');
-  } catch(e) { toast('خطأ في تحميل البيانات','danger'); }
-};
-
-window.addEditVideoItem = function() {
-  const div = document.createElement('div');
-  div.className = 'video-item';
-  div.innerHTML = `<input type="url" placeholder="https://..." class="yt-input"><input type="text" placeholder="عنوان الحصة" style="width:180px"><button type="button" class="btn-remove-video" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`;
-  $('editVideoItems').appendChild(div);
-};
-
-window.saveEditContent = async function() {
-  const id = $('editContentId').value;
-  if (!id) return;
-  const btn = document.querySelector('[onclick="saveEditContent()"]');
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
-  try {
-    const videoUrls = [];
-    document.querySelectorAll('#editVideoItems .video-item').forEach(item => {
-      const url = item.querySelectorAll('input')[0].value;
-      const title = item.querySelectorAll('input')[1].value;
-      if (url) videoUrls.push({url,title});
-    });
-    let pdfTextUrl = null, pdfSolUrl = null;
-    const pdfTF = $('editPdfTextFile').files[0];
-    const pdfSF = $('editPdfSolFile').files[0];
-    if (pdfTF) { btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> جاري رفع PDF النص...';      pdfTextUrl = await uploadToCloudinary(pdfTF,'pdf'); }
-    if (pdfSF) { btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> جاري رفع PDF الإصلاح...';   pdfSolUrl  = await uploadToCloudinary(pdfSF,'pdf'); }
-    const updates = {
-      level:$('editVLevel').value, type:$('editVType').value, section:$('editVSection').value,
-      title:$('editVTitle').value, chapter:$('editVChapter').value, desc:$('editVDesc').value,
-      videoUrls, videoUrl:videoUrls[0]?.url||''
-    };
-    if (pdfTextUrl) updates.pdfText     = pdfTextUrl;
-    if (pdfSolUrl)  updates.pdfSolution = pdfSolUrl;
-    await updateDoc(doc(db,'videos',id), updates);
-    toast('تم حفظ التعديلات بنجاح!','success');
-    $('editContentModal').classList.remove('open');
-    loadContentList();
-  } catch(e) { toast('خطأ: '+e.message,'danger'); }
-  finally { btn.disabled=false; btn.innerHTML='<i class="fas fa-save"></i> حفظ التعديلات'; }
-};
-
-window.deleteContent = async function() {
-  const id = $('editContentId').value;
-  if (!id) return;
-  if (!confirm('هل أنت متأكد من حذف هذا المحتوى نهائياً؟')) return;
-  try {
-    await deleteDoc(doc(db,'videos',id));
-    toast('تم حذف المحتوى','danger');
-    $('editContentModal').classList.remove('open');
-    loadContentList();
-  } catch(e) { toast('خطأ: '+e.message,'danger'); }
-};
-
-// HELPERS
 window.addVideoItem = function() {
-  const div=document.createElement('div');
-  div.className='video-item';
+  const div=document.createElement('div'); div.className='video-item';
   div.innerHTML=`<input type="url" placeholder="https://www.youtube.com/watch?v=..." class="yt-input"><input type="text" placeholder="عنوان الحصة (اختياري)" style="width:200px"><button type="button" class="btn-remove-video" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`;
   $('videoItems').appendChild(div);
 };
 
 window.previewReceipt_ = function(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const preview = document.getElementById('receiptPreview_');
-  const img     = document.getElementById('receiptImg_');
+  const file=input.files[0]; if (!file) return;
   if (file.type.startsWith('image/')) {
-    const reader = new FileReader();
-    reader.onload = e => {
-      img.src = e.target.result;
-      preview.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-  } else {
-    preview.style.display = 'none';
-  }
+    const r=new FileReader(); r.onload=e=>{ $('receiptImg_').src=e.target.result; $('receiptPreview_').style.display='block'; }; r.readAsDataURL(file);
+  } else { $('receiptPreview_').style.display='none'; }
 };
 
 window.showFN = function(input, id) {
-  const el=$(id);
-  if(input.files[0]){el.textContent='✅ '+input.files[0].name;el.style.display='block';}
+  const el=$(id); if(input.files[0]){el.textContent='✅ '+input.files[0].name;el.style.display='block';}
 };
 
 window.openAddSessionModal = function() {
@@ -1785,15 +1635,186 @@ window.openAddSessionModal = function() {
 
 window.selectPlan = function(plan, card) {
   document.querySelectorAll('.plan-card').forEach(c=>c.classList.remove('selected'));
-  card.classList.add('selected');
-  $('selectedPlan').value=plan;
+  card.classList.add('selected'); $('selectedPlan').value=plan;
 };
 
 window.switchAdminTab = function(tab, btn) {
   document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
   document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
-  $(`panel-${tab}`).classList.add('active');
+  $(`panel-${tab}`)?.classList.add('active');
+  if (tab==='edit') loadContentList();
+};
+
+// ══ USERS TABLE ══
+let allUsersData = [];
+let _roleFilter = 'all';
+
+function loadUsersTable(uSnap) {
+  allUsersData = [];
+  uSnap.forEach(d => allUsersData.push({id:d.id,...d.data()}));
+  renderUsersTable(allUsersData);
+}
+
+function renderUsersTable(users) {
+  if ($('usersCount')) $('usersCount').textContent = `${users.length} مستخدم`;
+  const roleColors = {
+    student:{bg:'rgba(16,185,129,.12)',color:'#059669',icon:'fa-user-graduate'},
+    parent: {bg:'rgba(37,99,235,.12)', color:'var(--blue-light)',icon:'fa-user-friends'},
+    teacher:{bg:'rgba(245,158,11,.12)',color:'#d97706',icon:'fa-chalkboard-teacher'},
+    admin:  {bg:'rgba(239,68,68,.12)', color:'#dc2626',icon:'fa-user-shield'},
+  };
+  const rows = users.map(u => {
+    const name = u.firstName ? `${u.firstName} ${u.lastName||''}`.trim() : (u.name||'—');
+    const initial = name.charAt(0).toUpperCase();
+    const rc = roleColors[u.userType]||{bg:'rgba(148,163,184,.12)',color:'var(--gray-600)',icon:'fa-user'};
+    const avatarColor = u.userType==='student'?'#10b981':u.userType==='parent'?'#2563eb':u.userType==='teacher'?'#f59e0b':'#ef4444';
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:10px">
+        <div style="width:34px;height:34px;border-radius:50%;background:${avatarColor}20;color:${avatarColor};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0">${initial}</div>
+        <div><div style="font-weight:700;font-size:.88rem">${name}</div>
+          <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:.72rem;font-weight:700;background:${rc.bg};color:${rc.color}">
+            <i class="fas ${rc.icon}" style="font-size:.65rem"></i> ${ROLES[u.userType]||u.userType||'—'}
+          </span></div></div></td>
+      <td style="font-size:.82rem;color:var(--gray-600)">${u.email||'—'}</td>
+      <td style="font-size:.82rem">${u.phone||'—'}</td>
+      <td>${u.level?`<span class="badge badge-info">السنة ${u.level}</span>`:'—'}</td>
+      <td>${subBadge(u.subscriptionStatus)}</td>
+      <td><button class="btn btn-sm ${u.subscriptionStatus==='active'?'btn-danger-outline':'btn-success'}" onclick="toggleSub('${u.id}','${u.subscriptionStatus}')">
+        ${u.subscriptionStatus==='active'?'<i class="fas fa-ban"></i> إلغاء':'<i class="fas fa-check"></i> تفعيل'}
+      </button></td>
+    </tr>`;
+  });
+  $('usersTable').innerHTML = rows.join('') || `<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--gray-400)">لا يوجد مستخدمون</td></tr>`;
+}
+
+window.filterByRole = function(role, btn) {
+  _roleFilter = role;
+  document.querySelectorAll('.users-filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); applyUsersFilter();
+};
+window.filterUsers = function() { applyUsersFilter(); };
+function applyUsersFilter() {
+  const q = ($('userSearch')?.value||'').toLowerCase().trim();
+  let f = _roleFilter==='all' ? allUsersData : allUsersData.filter(u=>u.userType===_roleFilter);
+  if (q) f = f.filter(u=>{ const n=u.firstName?`${u.firstName} ${u.lastName||''}`:(u.name||''); return n.toLowerCase().includes(q)||(u.email||'').toLowerCase().includes(q); });
+  renderUsersTable(f);
+}
+
+// ══ PARENT RECEIPTS HISTORY ══
+async function loadParentReceiptsHistory() {
+  const el = $('parentReceiptsHistory'); if (!el) return;
+  try {
+    const snap = await getDocs(query(collection(db,'receipts'), where('userId','==',CU.uid), orderBy('createdAt','desc')));
+    if (snap.empty) return;
+    const rows = [];
+    snap.forEach(d => {
+      const r = d.data();
+      const childName = r.childName || r.name || '—';
+      const planLabel = {recordings:'التسجيلات — 50 د.ت', sessions:'الحصص المباشرة — 40 د.ت'}[r.plan] || r.plan || '—';
+      const methodLabel = {bank:'تحويل بنكي',post:'البريد التونسي',d17:'D17',edinar:'eDinar'}[r.paymentMethod] || r.paymentMethod || '—';
+      rows.push(`<tr>
+        <td><strong>${childName}</strong></td>
+        <td style="font-size:.85rem">${planLabel}</td>
+        <td style="font-size:.85rem">${methodLabel}</td>
+        <td style="font-size:.82rem;color:var(--gray-600)">${fmt(r.createdAt)}</td>
+        <td>${subBadge(r.status)}</td>
+      </tr>`);
+    });
+    el.innerHTML = rows.join('');
+  } catch(e) { console.error(e); }
+}
+
+// ══ PARENT CHILDREN — show name not email ══
+
+// ══ CONTENT EDIT ══
+window.loadContentList = async function() {
+  const level=$('editFilterLevel')?.value, type=$('editFilterType')?.value;
+  const list=$('contentEditList'); if(!list) return;
+  list.innerHTML=`<div class="empty-state"><i class="fas fa-spinner fa-spin"></i><h3>جاري التحميل...</h3></div>`;
+  try {
+    const filters=[];
+    if(level) filters.push(where('level','==',level));
+    if(type)  filters.push(where('type','==',type));
+    const snap=await getDocs(filters.length ? query(collection(db,'videos'),...filters) : collection(db,'videos'));
+    if(snap.empty){list.innerHTML=`<div class="empty-state"><i class="fas fa-folder-open"></i><h3>لا يوجد محتوى</h3></div>`;return;}
+    const rows=[];
+    snap.forEach(d=>{
+      const v=d.data(); const vCount=v.videoUrls?.length||(v.videoUrl?1:0);
+      rows.push(`<div class="content-list-item">
+        <div class="content-item-info" style="flex:1;min-width:0">
+          <h4>${v.title||'—'}</h4>
+          <p>السنة ${v.level} • ${TYPES[v.type]||v.type||'—'} ${v.chapter?'• '+v.chapter:''} ${v.section?'• '+(SECTIONS[v.section]||v.section):''}</p>
+          <p style="margin-top:4px">
+            ${vCount?`<span style="color:var(--blue-light);font-size:.78rem"><i class="fas fa-video"></i> ${vCount} فيديو</span> `:''}
+            ${v.pdfText?`<span style="color:var(--danger);font-size:.78rem"><i class="fas fa-file-pdf"></i> نص </span>`:''}
+            ${v.pdfSolution?`<span style="color:var(--success);font-size:.78rem"><i class="fas fa-file-pdf"></i> إصلاح</span>`:''}
+          </p>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="openEditContent('${d.id}')"><i class="fas fa-edit"></i> تعديل</button>
+      </div>`);
+    });
+    list.innerHTML=rows.join('');
+  } catch(e){list.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i><h3>خطأ: ${e.message}</h3></div>`;}
+};
+
+window.openEditContent = async function(id) {
+  try {
+    const snap=await getDoc(doc(db,'videos',id)); if(!snap.exists()) return;
+    const v=snap.data();
+    $('editContentId').value=id; $('editVLevel').value=v.level||'7'; $('editVType').value=v.type||'lesson';
+    $('editVSection').value=v.section||''; $('editVTitle').value=v.title||''; $('editVChapter').value=v.chapter||''; $('editVDesc').value=v.desc||'';
+    const videos=v.videoUrls?.length?v.videoUrls:(v.videoUrl?[{url:v.videoUrl,title:''}]:[]);
+    $('editVideoItems').innerHTML=videos.map((vv,i)=>`<div class="video-item"><input type="url" value="${vv.url||''}" placeholder="https://..." class="yt-input"><input type="text" value="${vv.title||''}" placeholder="عنوان الحصة" style="width:180px">${i>0?`<button type="button" class="btn-remove-video" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`:''}</div>`).join('')||`<div class="video-item"><input type="url" placeholder="https://..." class="yt-input"><input type="text" placeholder="عنوان الحصة" style="width:180px"></div>`;
+    $('editPdfTextCurrent').innerHTML=v.pdfText?`<a href="${v.pdfText}" target="_blank" style="color:var(--danger);font-size:.8rem"><i class="fas fa-file-pdf"></i> عرض الملف الحالي</a>`:'<span style="color:var(--gray-400);font-size:.8rem">لا يوجد</span>';
+    $('editPdfSolCurrent').innerHTML=v.pdfSolution?`<a href="${v.pdfSolution}" target="_blank" style="color:var(--success);font-size:.8rem"><i class="fas fa-file-pdf"></i> عرض الملف الحالي</a>`:'<span style="color:var(--gray-400);font-size:.8rem">لا يوجد</span>';
+    ['editPdfTextFn','editPdfSolFn'].forEach(i=>{$(i).style.display='none';});
+    ['editPdfTextZone','editPdfSolZone'].forEach(i=>{$(i).style.borderColor='';});
+    $('editPdfTextFile').value=''; $('editPdfSolFile').value='';
+    $('editContentModal').classList.add('open');
+  } catch(e){toast('خطأ في التحميل','danger');}
+};
+
+window.addEditVideoItem = function() {
+  const div=document.createElement('div'); div.className='video-item';
+  div.innerHTML=`<input type="url" placeholder="https://..." class="yt-input"><input type="text" placeholder="عنوان الحصة" style="width:180px"><button type="button" class="btn-remove-video" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`;
+  $('editVideoItems').appendChild(div);
+};
+
+window.saveEditContent = async function() {
+  const id=$('editContentId').value; if(!id) return;
+  const btn=document.querySelector('[onclick="saveEditContent()"]');
+  btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+  try {
+    const videoUrls=[];
+    document.querySelectorAll('#editVideoItems .video-item').forEach(item=>{
+      const url=item.querySelectorAll('input')[0].value, title=item.querySelectorAll('input')[1].value;
+      if(url) videoUrls.push({url,title});
+    });
+    let pdfTextUrl=null, pdfSolUrl=null;
+    const pdfTF=$('editPdfTextFile').files[0], pdfSF=$('editPdfSolFile').files[0];
+    if(pdfTF){btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> جاري رفع PDF النص...';    pdfTextUrl=await uploadToCloudinary(pdfTF,'pdf');}
+    if(pdfSF){btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> جاري رفع PDF الإصلاح...'; pdfSolUrl=await uploadToCloudinary(pdfSF,'pdf');}
+    const updates={level:$('editVLevel').value,type:$('editVType').value,section:$('editVSection').value,title:$('editVTitle').value,chapter:$('editVChapter').value,desc:$('editVDesc').value,videoUrls,videoUrl:videoUrls[0]?.url||''};
+    if(pdfTextUrl) updates.pdfText=pdfTextUrl;
+    if(pdfSolUrl)  updates.pdfSolution=pdfSolUrl;
+    await updateDoc(doc(db,'videos',id),updates);
+    toast('تم حفظ التعديلات بنجاح!','success');
+    $('editContentModal').classList.remove('open');
+    loadContentList();
+  } catch(e){toast('خطأ: '+e.message,'danger');}
+  finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-save"></i> حفظ التعديلات';}
+};
+
+window.deleteContent = async function() {
+  const id=$('editContentId').value; if(!id) return;
+  if(!confirm('هل أنت متأكد من حذف هذا المحتوى نهائياً؟')) return;
+  try {
+    await deleteDoc(doc(db,'videos',id));
+    toast('تم حذف المحتوى','danger');
+    $('editContentModal').classList.remove('open');
+    loadContentList();
+  } catch(e){toast('خطأ: '+e.message,'danger');}
 };
 
 function extractYTId(url){const m=(url||'').match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);return m?m[1]:null;}
