@@ -549,6 +549,7 @@
           </div>
         </div>
       </div>`;
+  }
 
   window.openViewer = function(itemId, tab='video') {
     const item = allContent.find(i => i.id === itemId);
@@ -678,7 +679,6 @@
   $('hamburgerBtn').addEventListener('click', () => $('sidebar').classList.toggle('open'));
   $('viewerModal').addEventListener('click', e => { if (e.target===$('viewerModal')) closeViewer(); });
   document.addEventListener('keydown', e => { if (e.key==='Escape') closeViewer(); });
-}
-</script></script>
+</script>
 </body>
 </html>
