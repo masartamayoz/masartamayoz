@@ -551,84 +551,10 @@
       </div>`;
   }
 
-  window.openViewer = function(itemId, tab='video') {
-    const item = allContent.find(i => i.id === itemId);
-    if (!item) return;
-
-    const videos     = item.videoUrls?.length ? item.videoUrls : (item.videoUrl?[{url:item.videoUrl,title:''}]:[]);
-    const hasPdfText = !!item.pdfText;
-    const hasPdfSol  = !!item.pdfSolution;
-    const hasVideo   = videos.length > 0;
-    currentVideos = videos;
-
-    $('viewerTitle').textContent   = item.title;
-    $('viewerLevel').textContent   = LEVELS[item.level] || `السنة ${item.level}`;
-    $('viewerChapter').textContent = item.chapter || '';
-
-    // Tabs availability
-    $('tab-video').disabled    = !hasVideo;
-    $('tab-pdf-text').disabled = !hasPdfText;
-    $('tab-pdf-sol').disabled  = !hasPdfSol;
-
-    // Playlist
-    const pt = $('playlistTabs');
-    if (videos.length > 1) {
-      pt.style.display = 'flex';
-      pt.innerHTML = videos.map((v,i)=>`
-        <button class="playlist-tab ${i===0?'active':''}" onclick="switchVideo(${i})">
-          <i class="fas fa-play-circle"></i> ${v.title||`حصة ${i+1}`}
-        </button>`).join('');
-    } else { pt.style.display = 'none'; }
-
-    // Load video
-    if (hasVideo) {
-      const ytId = extractYTId(videos[0].url||'');
-      $('videoIframe').src = ytId ? `https://www.youtube.com/embed/${ytId}?rel=0` : '';
-    } else { $('videoIframe').src = ''; }
-
-    // Load PDFs into wrappers
-    renderPdf('pdfTextWrapper', item.pdfText);
-    renderPdf('pdfSolWrapper',  item.pdfSolution);
-
-    // Footer actions — تحميل فقط
-    const acts = [];
-    if (hasPdfText) acts.push(`<a href="${item.pdfText}" download target="_blank" class="viewer-btn viewer-btn-pdf"><i class="fas fa-download"></i> تحميل النص</a>`);
-    if (hasPdfSol)  acts.push(`<a href="${item.pdfSolution}" download target="_blank" class="viewer-btn viewer-btn-sol"><i class="fas fa-download"></i> تحميل الإصلاح</a>`);
-    $('viewerActions').innerHTML = acts.join('');
-
-    // Fix tab if unavailable
-    if (tab === 'video'    && !hasVideo)   tab = hasPdfText ? 'pdf-text' : 'pdf-sol';
-    if (tab === 'pdf-text' && !hasPdfText) tab = hasVideo ? 'video' : 'pdf-sol';
-    if (tab === 'pdf-sol'  && !hasPdfSol)  tab = hasVideo ? 'video' : 'pdf-text';
-
-    switchViewerTab(tab);
-    $('viewerModal').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  };
-
-  window.switchVideo = function(index) {
-    const ytId = extractYTId(currentVideos[index]?.url||'');
-    if (ytId) $('videoIframe').src = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`;
-    document.querySelectorAll('.playlist-tab').forEach((t,i)=>t.classList.toggle('active',i===index));
-  };
-
-  window.switchViewerTab = function(tab) {
-    ['video','pdf-text','pdf-sol'].forEach(t => {
-      const btn = $(`tab-${t}`); if (btn) btn.classList.toggle('active', t===tab);
-    });
-    document.querySelectorAll('.viewer-body').forEach(b=>b.classList.remove('active'));
-    const body = $(`body-${tab}`); if (body) body.classList.add('active');
-  };
-
-  window.closeViewer = function() {
-    $('videoIframe').src = '';
-    $('viewerModal').classList.remove('open');
-    document.body.style.overflow = '';
-  };
-
   window.selectLevel = async function(level, btn) {
-    if (!allowedLevels.includes(level)) { toast('هذا المستوى غير متاح لك','warning'); return; }
-    currentLevel = level;
+    const lvl = parseInt(level);
+    if (!allowedLevels.includes(lvl)) { toast('هذا المستوى غير متاح لك','warning'); return; }
+    currentLevel = lvl;
     document.querySelectorAll('.level-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
     updateURL();
@@ -662,6 +588,75 @@
       (i.chapter||'').toLowerCase().includes(q)||
       (i.desc||'').toLowerCase().includes(q)
     ));
+  };
+
+  window.openViewer = function(itemId, tab='video') {
+    const item = allContent.find(i => i.id === itemId);
+    if (!item) return;
+
+    const videos     = item.videoUrls?.length ? item.videoUrls : (item.videoUrl?[{url:item.videoUrl,title:''}]:[]);
+    const hasPdfText = !!item.pdfText;
+    const hasPdfSol  = !!item.pdfSolution;
+    const hasVideo   = videos.length > 0;
+    currentVideos = videos;
+
+    $('viewerTitle').textContent   = item.title;
+    $('viewerLevel').textContent   = LEVELS[item.level] || `السنة ${item.level}`;
+    $('viewerChapter').textContent = item.chapter || '';
+
+    $('tab-video').disabled    = !hasVideo;
+    $('tab-pdf-text').disabled = !hasPdfText;
+    $('tab-pdf-sol').disabled  = !hasPdfSol;
+
+    const pt = $('playlistTabs');
+    if (videos.length > 1) {
+      pt.style.display = 'flex';
+      pt.innerHTML = videos.map((v,i)=>`
+        <button class="playlist-tab ${i===0?'active':''}" onclick="switchVideo(${i})">
+          <i class="fas fa-play-circle"></i> ${v.title||`حصة ${i+1}`}
+        </button>`).join('');
+    } else { pt.style.display = 'none'; }
+
+    if (hasVideo) {
+      const ytId = extractYTId(videos[0].url||'');
+      $('videoIframe').src = ytId ? `https://www.youtube.com/embed/${ytId}?rel=0` : '';
+    } else { $('videoIframe').src = ''; }
+
+    renderPdf('pdfTextWrapper', item.pdfText);
+    renderPdf('pdfSolWrapper',  item.pdfSolution);
+
+    const acts = [];
+    if (hasPdfText) acts.push(`<a href="${item.pdfText}" download target="_blank" class="viewer-btn viewer-btn-pdf"><i class="fas fa-download"></i> تحميل النص</a>`);
+    if (hasPdfSol)  acts.push(`<a href="${item.pdfSolution}" download target="_blank" class="viewer-btn viewer-btn-sol"><i class="fas fa-download"></i> تحميل الإصلاح</a>`);
+    $('viewerActions').innerHTML = acts.join('');
+
+    if (tab === 'video'    && !hasVideo)   tab = hasPdfText ? 'pdf-text' : 'pdf-sol';
+    if (tab === 'pdf-text' && !hasPdfText) tab = hasVideo ? 'video' : 'pdf-sol';
+    if (tab === 'pdf-sol'  && !hasPdfSol)  tab = hasVideo ? 'video' : 'pdf-text';
+
+    switchViewerTab(tab);
+    $('viewerModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.switchVideo = function(index) {
+    const ytId = extractYTId(currentVideos[index]?.url||'');
+    if (ytId) $('videoIframe').src = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`;
+    document.querySelectorAll('.playlist-tab').forEach((t,i)=>t.classList.toggle('active',i===index));
+  };
+
+  window.switchViewerTab = function(tab) {
+    ['video','pdf-text','pdf-sol'].forEach(t => {
+      const btn = $(`tab-${t}`); if (btn) btn.classList.toggle('active', t===tab);
+    });
+    document.querySelectorAll('.viewer-body').forEach(b=>b.classList.remove('active'));
+    const body = $(`body-${tab}`); if (body) body.classList.add('active');
+  };
+
+  window.closeViewer = function() {
+    $('videoIframe').src = '';
+    $('viewerModal').classList.remove('open');
+    document.body.style.overflow = '';
   };
 
   function extractYTId(url) {
