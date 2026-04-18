@@ -1334,21 +1334,6 @@ async function loadAdmin() {
   uSnap.forEach(d=>{const u=d.data();if(u.userType==='teacher'){const o=document.createElement('option');o.value=d.id;o.textContent=u.firstName?`${u.firstName} ${u.lastName||''}`:(u.name||'');tSel.appendChild(o);}});
 }
 
-function loadUsersTable(uSnap) {
-  const rows=[];
-  uSnap.forEach(d=>{const u=d.data();const name=u.firstName?`${u.firstName} ${u.lastName||''}`:(u.name||'—');
-    rows.push(`<tr>
-      <td><strong>${name}</strong></td><td style="font-size:.82rem">${u.email||'—'}</td>
-      <td style="font-size:.82rem">${u.phone||'—'}</td>
-      <td><span style="font-size:.78rem;font-weight:700">${ROLES[u.userType]||u.userType||'—'}</span></td>
-      <td>${u.level?`السنة ${u.level}`:'—'}</td><td>${subBadge(u.subscriptionStatus)}</td>
-      <td><button class="btn btn-sm ${u.subscriptionStatus==='active'?'btn-danger-outline':'btn-success'}" onclick="toggleSub('${d.id}','${u.subscriptionStatus}')">
-        ${u.subscriptionStatus==='active'?'إلغاء':'تفعيل'}
-      </button></td>
-    </tr>`);});
-  $('usersTable').innerHTML=rows.join('')||`<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--gray-400)">لا يوجد مستخدمون</td></tr>`;
-}
-
 async function loadAdminSessions() {
   try {
     const snap = await getDocs(query(collection(db,'teacherSessions'),orderBy('createdAt','desc')));
