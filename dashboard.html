@@ -2256,7 +2256,7 @@ $('groupForm')?.addEventListener('submit', async e => {
     toast('تم حفظ المجموعة بنجاح!','success');
     $('groupModal').classList.remove('open');
     loadAdminGroups();
-  } catch(err) { toast('خطأ: ' + err.message,'danger'); }
+  } catch(err) { toast('خطأ: '+err.message,'danger'); }
   finally { btn.disabled=false; btn.innerHTML='<i class="fas fa-save"></i> حفظ المجموعة'; }
 });
 
@@ -2267,7 +2267,7 @@ window.generateGroupSessions = async function(groupId) {
   const g = { id: groupId, ...snap.data() };
   const created = await createSessionsFromGroup(g, 0);
   const next    = await createSessionsFromGroup(g, 1);
-  toast(`تم توليد ${created + next} حصة جديدة للمجموعة ${g.name}`,'success');
+  toast(`تم توليد ${created + next} حصة للمجموعة ${g.name}`,'success');
   loadAdminGroups();
 };
 
@@ -2279,7 +2279,7 @@ window.generateAllSessions = async function() {
     total += await createSessionsFromGroup(g, 0);
     total += await createSessionsFromGroup(g, 1);
   }
-  toast(`تم توليد ${total} حصة جديدة لجميع المجموعات`,'success');
+  toast(`تم توليد ${total} حصة لجميع المجموعات`,'success');
   loadSchedule();
 };
 
@@ -2545,21 +2545,167 @@ window.viewAttendance = async function(sessionId) {
 };
 
 window.viewGroupStudents = async function(groupId, groupName) {
+  await renderGroupStudents(groupId, groupName);
+  $('attendanceModal').classList.add('open');
+};
+
+async function renderGroupStudents(groupId, groupName) {
   const snap = await getDocs(query(collection(db,'groupStudents'), where('groupId','==',groupId)));
   const students = [];
-  snap.forEach(d => students.push(d.data()));
+  snap.forEach(d => students.push({docId: d.id, ...d.data()}));
 
   $('attendanceContent').innerHTML = `
-    <div style="font-size:.9rem;font-weight:800;color:var(--blue-dark);margin-bottom:14px">
-      تلاميذ ${groupName} (${students.length})
-    </div>
-    ${students.length ? students.map(s => `
-      <div style="background:var(--gray-50);border-radius:8px;padding:10px 14px;margin-bottom:8px">
-        <strong style="font-size:.88rem">${s.studentName||'—'}</strong>
-      </div>`).join('') :
-      '<div class="empty-state"><i class="fas fa-users"></i><h3>لا يوجد تلاميذ بعد</h3></div>'
-    }`;
-  $('attendanceModal').classList.add('open');
+    <div style="margin-bottom:16px">
+      <div style="font-size:.95rem;font-weight:800;color:var(--blue-dark);margin-bottom:14px">
+        <i class="fas fa-users"></i> تلاميذ ${groupName}
+        <span style="background:var(--blue-light);color:white;padding:2px 10px;border-radius:20px;font-size:.75rem;margin-right:8px">${students.length}</span>
+      </div>
+
+      <!-- بحث وإضافة تلميذ -->
+      <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:12px;padding:14px;margin-bottom:16px">
+        <label style="font-size:.82rem;font-weight:700;color:var(--gray-600);display:block;margin-bottom:8px">
+          <i class="fas fa-user-plus" style="color:var(--blue-light)"></i> إضافة تلميذ
+        </label>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="studentSearchInput" class="form-control"
+            placeholder="ابحث بالاسم أو البريد الإلكتروني..."
+            oninput="searchStudentsToAdd('${groupId}')"
+            style="flex:1">
+        </div>
+        <div id="studentSearchResults" style="margin-top:8px"></div>
+      </div>
+
+      <!-- قائمة التلاميذ الحاليين -->
+      <div id="currentStudentsList">
+        ${students.length ? students.map(s => `
+          <div style="background:white;border:1px solid var(--gray-200);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:36px;height:36px;border-radius:50%;background:rgba(37,99,235,.1);color:var(--blue-light);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;flex-shrink:0">
+                ${(s.studentName||'؟').charAt(0)}
+              </div>
+              <div>
+                <div style="font-weight:700;font-size:.88rem">${s.studentName||'—'}</div>
+                <div style="font-size:.75rem;color:var(--gray-400)">${s.studentEmail||''}</div>
+              </div>
+            </div>
+            <button onclick="removeStudentFromGroup('${s.docId}','${groupId}','${groupName}')"
+              style="padding:5px 12px;border-radius:8px;border:1px solid var(--danger);background:rgba(239,68,68,.08);color:var(--danger);font-family:inherit;font-size:.78rem;font-weight:700;cursor:pointer">
+              <i class="fas fa-times"></i> إزالة
+            </button>
+          </div>`).join('') :
+          '<div class="empty-state" style="padding:24px 0"><i class="fas fa-users"></i><h3>لا يوجد تلاميذ بعد</h3><p>ابحث أعلاه لإضافة تلاميذ</p></div>'
+        }
+      </div>
+    </div>`;
+}
+
+window.searchStudentsToAdd = async function(groupId) {
+  const q = $('studentSearchInput').value.trim().toLowerCase();
+  const resultsEl = $('studentSearchResults');
+
+  if (q.length < 2) { resultsEl.innerHTML = ''; return; }
+
+  resultsEl.innerHTML = `<div style="font-size:.8rem;color:var(--gray-400);padding:6px 0"><i class="fas fa-spinner fa-spin"></i> جاري البحث...</div>`;
+
+  try {
+    // جلب كل التلاميذ وتصفية محلياً
+    const snap = await getDocs(query(collection(db,'users'), where('userType','==','student')));
+
+    // جلب التلاميذ المضافين حالياً
+    const gsSnap = await getDocs(query(collection(db,'groupStudents'), where('groupId','==',groupId)));
+    const addedIds = new Set();
+    gsSnap.forEach(d => addedIds.add(d.data().studentId));
+
+    const matches = [];
+    snap.forEach(d => {
+      const u = d.data();
+      const name = `${u.firstName||''} ${u.lastName||''}`.toLowerCase();
+      const email = (u.email||'').toLowerCase();
+      if ((name.includes(q) || email.includes(q)) && !addedIds.has(d.id)) {
+        matches.push({id: d.id, ...u});
+      }
+    });
+
+    if (!matches.length) {
+      resultsEl.innerHTML = `<div style="font-size:.82rem;color:var(--gray-400);padding:6px 0">لا توجد نتائج</div>`;
+      return;
+    }
+
+    resultsEl.innerHTML = matches.slice(0,5).map(u => {
+      const name = u.firstName ? `${u.firstName} ${u.lastName||''}`.trim() : (u.name||u.email);
+      const subColor = u.subscriptionStatus==='active' ? 'var(--success)' : 'var(--danger)';
+      const subLabel = u.subscriptionStatus==='active' ? 'مفعّل' : 'غير مفعّل';
+      return `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:white;border:1px solid var(--gray-200);border-radius:9px;margin-bottom:6px;gap:10px">
+          <div>
+            <div style="font-weight:700;font-size:.85rem">${name}</div>
+            <div style="font-size:.75rem;color:var(--gray-400)">${u.email||''} •
+              <span style="color:${subColor};font-weight:700">${subLabel}</span> •
+              السنة ${u.level||'—'}
+            </div>
+          </div>
+          <button onclick="addStudentToGroup('${u.id}','${name}','${u.email||''}','${groupId}')"
+            style="padding:6px 14px;border-radius:8px;border:none;background:var(--blue-light);color:white;font-family:inherit;font-size:.8rem;font-weight:700;cursor:pointer;flex-shrink:0">
+            <i class="fas fa-plus"></i> إضافة
+          </button>
+        </div>`;
+    }).join('');
+
+  } catch(e) {
+    resultsEl.innerHTML = `<div style="font-size:.82rem;color:var(--danger)">${e.message}</div>`;
+  }
+};
+
+window.addStudentToGroup = async function(studentId, studentName, studentEmail, groupId) {
+  try {
+    // تحقق أنه غير مضاف
+    const existing = await getDocs(query(
+      collection(db,'groupStudents'),
+      where('groupId','==',groupId),
+      where('studentId','==',studentId)
+    ));
+    if (!existing.empty) { toast('التلميذ مضاف في هذه المجموعة مسبقاً','warning'); return; }
+
+    await addDoc(collection(db,'groupStudents'), {
+      groupId, studentId, studentName, studentEmail,
+      addedAt: serverTimestamp()
+    });
+
+    // تحديث عدد المجموعة
+    const gRef = doc(db,'groups',groupId);
+    const gSnap = await getDoc(gRef);
+    if (gSnap.exists()) {
+      await updateDoc(gRef, { currentCount: (gSnap.data().currentCount||0) + 1 });
+    }
+
+    toast(`تم إضافة ${studentName} للمجموعة ✅`,'success');
+    $('studentSearchInput').value = '';
+    $('studentSearchResults').innerHTML = '';
+
+    // إعادة تحميل القائمة
+    const modalTitle = $('attendanceContent').querySelector('[data-group-name]');
+    const gName = gSnap.exists() ? gSnap.data().name : '';
+    await renderGroupStudents(groupId, gName);
+
+  } catch(e) { toast('خطأ: '+e.message,'danger'); }
+};
+
+window.removeStudentFromGroup = async function(docId, groupId, groupName) {
+  if (!confirm('هل تريد إزالة هذا التلميذ من المجموعة؟')) return;
+  try {
+    await deleteDoc(doc(db,'groupStudents',docId));
+
+    // تحديث العدد
+    const gRef = doc(db,'groups',groupId);
+    const gSnap = await getDoc(gRef);
+    if (gSnap.exists()) {
+      const count = Math.max(0,(gSnap.data().currentCount||1) - 1);
+      await updateDoc(gRef, { currentCount: count });
+    }
+
+    toast('تم إزالة التلميذ من المجموعة','danger');
+    await renderGroupStudents(groupId, groupName);
+  } catch(e) { toast('خطأ: '+e.message,'danger'); }
 };
 
 // ── حصص التلميذ (مع نظام المجموعات) ──
@@ -2572,10 +2718,19 @@ async function loadStudentSessions() {
     ));
 
     if (gsSnap.empty) {
+      // تحقق من حالة الاشتراك لتحديد الرسالة المناسبة
+      const isActive = CUD.subscriptionStatus === 'active';
       $('studentGroupInfo').innerHTML = `
         <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:16px">
-          <p style="font-weight:700;color:var(--gold)"><i class="fas fa-info-circle"></i> لم تُوزَّع على مجموعة بعد</p>
-          <p style="font-size:.85rem;color:var(--gray-600);margin-top:6px">سيتم توزيعك على مجموعة بعد تفعيل اشتراكك</p>
+          <p style="font-weight:700;color:var(--gold)">
+            <i class="fas fa-info-circle"></i>
+            ${isActive ? 'لم تُضَف إلى مجموعة بعد' : 'لم تُوزَّع على مجموعة بعد'}
+          </p>
+          <p style="font-size:.85rem;color:var(--gray-600);margin-top:6px">
+            ${isActive
+              ? 'اشتراكك مفعّل ✅ — سيقوم المدير بإضافتك إلى مجموعة قريباً'
+              : 'سيتم توزيعك على مجموعة بعد تفعيل اشتراكك'}
+          </p>
         </div>`;
       $('studentSessionsList').innerHTML = `<div class="empty-state"><i class="fas fa-calendar"></i><h3>لا توجد حصص</h3></div>`;
       return;
@@ -2682,7 +2837,7 @@ window.joinSession = async function(sessionId, meetLink, groupId) {
     const sessSnap = await getDoc(doc(db,'sessions',sessionId));
     const s = sessSnap.data();
     if (!isActive(s.date, s.startTime, s.duration)) {
-      toast('الحصة ليست في وقتها الآن — يمكنك الانضمام من 15 دقيقة قبل البداية','warning');
+      toast('الحصة ليست في وقتها — يمكنك الانضمام من 15 دقيقة قبل البداية','warning');
       return;
     }
 
