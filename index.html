@@ -1257,6 +1257,15 @@
       .footer-bottom { flex-direction: column; gap: 14px; text-align: center; }
       .hero-stats { flex-wrap: wrap; gap: 20px; }
     }
+    /* ══ TOAST ══ */
+    #toastContainer{position:fixed;bottom:24px;left:24px;z-index:99999;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+    .toast{display:flex;align-items:center;gap:10px;padding:12px 20px;border-radius:12px;font-size:.9rem;font-weight:600;color:white;box-shadow:0 4px 20px rgba(0,0,0,.2);animation:toastIn .3s ease;min-width:260px;max-width:360px;pointer-events:all}
+    @keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .toast-success{background:#10b981}
+    .toast-danger{background:#ef4444}
+    .toast-warning{background:#f59e0b;color:#0a1628}
+    .toast-info{background:#2563eb}
+    @media(max-width:480px){#toastContainer{left:12px;right:12px;bottom:12px}.toast{min-width:unset;width:100%}}
   </style>
 </head>
 <body>
@@ -1873,6 +1882,7 @@
 </div>
 
 <!-- ══════ FIREBASE + JS ══════ -->
+<div id="toastContainer"></div>
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js';
   import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
@@ -1977,7 +1987,19 @@
   });
 
   // ── Login ──
-  document.getElementById('loginUserForm').addEventListener('submit', async e => {
+  
+  // ── Toast ──
+  function toast(msg, type='info') {
+    const el = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = 'toast toast-' + type;
+    const icons = {success:'check-circle',danger:'exclamation-circle',warning:'exclamation-triangle',info:'info-circle'};
+    t.innerHTML = '<i class="fas fa-' + (icons[type]||'info-circle') + '"></i> ' + msg;
+    el.appendChild(t);
+    setTimeout(() => { t.style.cssText='opacity:0;transition:opacity .3s'; setTimeout(()=>t.remove(),300); }, 3500);
+  }
+
+document.getElementById('loginUserForm').addEventListener('submit', async e => {
     e.preventDefault();
     const email    = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
@@ -1986,7 +2008,7 @@
       closeModal();
       window.location.href = 'dashboard.html';
     } catch (err) {
-      alert('خطأ في تسجيل الدخول: ' + err.message);
+      toast('خطأ في تسجيل الدخول: ' + err.message, 'danger');
     }
   });
 
@@ -2002,9 +2024,9 @@
     const level     = document.getElementById('studentLevel')?.value || '';
     const phone     = document.getElementById('parentPhone')?.value || '';
 
-    if (!firstName || !lastName) { alert('يرجى إدخال الاسم واللقب'); return; }
-    if (password !== confirm) { alert('كلمة المرور غير متطابقة!'); return; }
-    if (!userType) { alert('يرجى اختيار نوع الحساب'); return; }
+    if (!firstName || !lastName) { toast('يرجى إدخال الاسم واللقب', 'warning'); return; }
+    if (password !== confirm) { toast('كلمة المرور غير متطابقة!', 'danger'); return; }
+    if (!userType) { toast('يرجى اختيار نوع الحساب', 'warning'); return; }
 
     const btn = e.target.querySelector('button[type="submit"]');
     btn.disabled = true; btn.textContent = 'جاري الإنشاء...';
@@ -2025,9 +2047,9 @@
       window.location.href = 'dashboard.html';
     } catch (err) {
       if (err.code === 'auth/email-already-in-use') {
-        alert('⚠️ هذا البريد مسجّل مسبقاً — يرجى تسجيل الدخول');
+        toast('هذا البريد مسجّل مسبقاً — يرجى تسجيل الدخول', 'warning');
       } else {
-        alert('خطأ: ' + err.message);
+        toast('خطأ: ' + err.message, 'danger');
       }
     } finally {
       btn.disabled = false; btn.textContent = 'إنشاء الحساب';
@@ -2064,9 +2086,9 @@
       if (err.code === 'auth/popup-closed-by-user') {
         // User closed popup - do nothing
       } else if (err.code === 'auth/unauthorized-domain') {
-        alert('⚠️ يرجى إضافة academy.masartamayoz.com في إعدادات Firebase → Authentication → Authorized domains');
+        toast('يرجى إضافة النطاق في إعدادات Firebase Authentication', 'warning');
       } else {
-        alert('خطأ في تسجيل الدخول بجوجل: ' + err.message);
+        toast('خطأ في تسجيل الدخول بجوجل: ' + err.message, 'danger');
       }
     }
   });
@@ -2099,7 +2121,7 @@
   document.getElementById('receiptForm').addEventListener('submit', async e => {
     e.preventDefault();
     const user = auth.currentUser;
-    if (!user) { alert('يجب تسجيل الدخول أولاً!'); openModal('login'); return; }
+    if (!user) { toast('يجب تسجيل الدخول أولاً!', 'warning'); openModal('login'); return; }
 
     const name     = document.getElementById('receiptName').value;
     const email    = document.getElementById('receiptEmail').value;
@@ -2108,7 +2130,7 @@
     const planInfo = document.getElementById('receiptPlanInfo').textContent;
     const submitBtn = e.target.querySelector('button[type="submit"]');
 
-    if (!file) { alert('يرجى رفع صورة وصل الخلاص'); return; }
+    if (!file) { toast('يرجى رفع صورة وصل الخلاص', 'warning'); return; }
 
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الرفع...';
@@ -2127,11 +2149,11 @@
         createdAt: serverTimestamp()
       });
 
-      alert('✅ تم إرسال وصل الخلاص بنجاح! سيتم تفعيل حسابك خلال 24 ساعة.');
+      toast('تم إرسال الوصل بنجاح! سيتم تفعيل حسابك خلال 24 ساعة', 'success');
       document.getElementById('receiptModal').classList.remove('open');
       e.target.reset();
     } catch (err) {
-      alert('خطأ في الإرسال: ' + err.message);
+      toast('خطأ في الإرسال: ' + err.message, 'danger');
     } finally {
       submitBtn.disabled = false;
       submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال الوصل';
