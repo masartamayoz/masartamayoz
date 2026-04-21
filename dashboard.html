@@ -154,7 +154,21 @@
     .empty-state h3{font-size:1rem;font-weight:700;color:var(--gray-600);margin-bottom:6px}
     .empty-state p{font-size:.85rem;color:var(--gray-400)}
 
-    /* ══ TOAST ══ */
+    /* ══ MAINTENANCE ══ */
+    .maint-tab{padding:9px 16px;border:none;background:none;font-family:inherit;font-size:.85rem;font-weight:600;color:var(--gray-600);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;margin-bottom:-2px}
+    .maint-tab:hover{color:var(--blue-light)}
+    .maint-tab.active{color:var(--blue-light);border-bottom-color:var(--blue-light)}
+    .maint-panel{animation:fadeIn .2s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+    .maint-card{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:12px;padding:16px}
+    .maint-card-title{font-weight:700;margin-bottom:6px;font-size:.9rem}
+    .maint-card-desc{font-size:.8rem;color:var(--gray-600);margin-bottom:12px}
+    .maint-count{background:var(--gray-200);color:var(--gray-600);padding:3px 10px;border-radius:20px;font-size:.78rem;font-weight:700;display:flex;align-items:center}
+    .maint-ext-card{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:12px;padding:16px}
+    .record-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:white;border:1px solid var(--gray-200);border-radius:10px;margin-bottom:8px;gap:10px;flex-wrap:wrap}
+    .record-info{flex:1;min-width:0}
+    .record-info h4{font-size:.85rem;font-weight:700;color:var(--blue-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .record-info p{font-size:.75rem;color:var(--gray-400);margin-top:2px}
     #toastContainer{position:fixed;bottom:24px;left:24px;z-index:99999;display:flex;flex-direction:column;gap:10px;pointer-events:none}
     .toast{display:flex;align-items:center;gap:10px;padding:12px 18px;border-radius:12px;font-size:.88rem;font-weight:600;color:white;box-shadow:0 4px 20px rgba(0,0,0,.2);animation:toastIn .3s ease;min-width:240px;max-width:320px;pointer-events:all}
     @keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
@@ -357,124 +371,266 @@
 
     <!-- MAINTENANCE PAGE -->
     <div class="page" id="page-admin-maintenance">
-      <div class="card" style="border:2px solid var(--danger);border-radius:16px">
-        <div class="card-header" style="background:rgba(239,68,68,.06);border-radius:14px 14px 0 0;padding:20px">
+
+      <!-- Header -->
+      <div class="card" style="border:2px solid var(--danger);margin-bottom:0">
+        <div class="card-header" style="background:rgba(239,68,68,.06)">
           <div>
             <div class="card-title" style="color:var(--danger)"><i class="fas fa-tools"></i> لوحة الصيانة والإعادة</div>
-            <p style="font-size:.82rem;color:var(--gray-600);margin-top:4px">هذه الأداة مخصصة للفترة التجريبية — تسمح بحذف البيانات التجريبية قبل الإطلاق الرسمي</p>
+            <p style="font-size:.82rem;color:var(--gray-600);margin-top:4px">مخصصة للفترة التجريبية — احذف البيانات قبل الإطلاق الرسمي</p>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="loadMaintenanceStats()">
+            <i class="fas fa-sync-alt"></i> تحديث الإحصائيات
+          </button>
+        </div>
+
+        <!-- تحذير -->
+        <div style="margin:0 20px 20px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:14px;display:flex;gap:12px;align-items:flex-start">
+          <i class="fas fa-exclamation-triangle" style="color:var(--danger);font-size:1.1rem;flex-shrink:0;margin-top:2px"></i>
+          <div style="font-size:.83rem">
+            <strong style="color:var(--danger)">تحذير — العمليات لا يمكن التراجع عنها</strong><br>
+            <span style="color:var(--gray-600)">حساب الأدمن الحالي محمي دائماً. Firebase Auth وCloudinary تحتاج حذفاً يدوياً من لوحاتهم.</span>
           </div>
         </div>
+
+        <!-- إحصائيات -->
+        <div style="padding:0 20px 20px">
+          <div style="font-weight:800;color:var(--blue-dark);margin-bottom:12px;font-size:.9rem">
+            <i class="fas fa-chart-bar" style="color:var(--blue-light)"></i> إحصائيات Firebase Firestore
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px" id="maintenanceStats">
+            <div class="stat-card" style="text-align:center;cursor:pointer;grid-column:1/-1" onclick="loadMaintenanceStats()">
+              <div style="font-size:1.5rem;color:var(--gold)"><i class="fas fa-sync-alt"></i></div>
+              <div style="font-size:.8rem;color:var(--gray-600);margin-top:6px">اضغط لتحميل الإحصائيات</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- قسم Firestore -->
+      <div class="card" style="border-top:none;border-radius:0 0 16px 16px;margin-bottom:16px">
         <div style="padding:20px">
 
-          <!-- تحذير -->
-          <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:12px;padding:16px;margin-bottom:24px;display:flex;gap:12px;align-items:flex-start">
-            <i class="fas fa-exclamation-triangle" style="color:var(--danger);font-size:1.2rem;margin-top:2px;flex-shrink:0"></i>
-            <div>
-              <div style="font-weight:800;color:var(--danger);margin-bottom:4px">تحذير — هذه العمليات لا يمكن التراجع عنها</div>
-              <div style="font-size:.83rem;color:var(--gray-600)">كل عملية حذف نهائية. حساب الأدمن الحالي محمي ولن يُحذف في أي حال.</div>
-            </div>
+          <!-- تبويبات الحذف -->
+          <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--gray-200);padding-bottom:0">
+            <button class="maint-tab active" id="mtab-selective" onclick="switchMaintTab('selective',this)">
+              <i class="fas fa-eraser"></i> حذف انتقائي
+            </button>
+            <button class="maint-tab" id="mtab-record" onclick="switchMaintTab('record',this)">
+              <i class="fas fa-search-minus"></i> حذف معطى واحد
+            </button>
+            <button class="maint-tab" id="mtab-full" onclick="switchMaintTab('full',this)" style="color:var(--danger)">
+              <i class="fas fa-fire"></i> إعادة ضبط كاملة
+            </button>
           </div>
 
-          <!-- إحصائيات -->
-          <div style="margin-bottom:24px">
-            <div style="font-weight:800;color:var(--blue-dark);margin-bottom:14px;font-size:.95rem">
-              <i class="fas fa-chart-bar" style="color:var(--blue-light)"></i> إحصائيات قاعدة البيانات
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px" id="maintenanceStats">
-              <div class="stat-card" style="text-align:center;cursor:pointer" onclick="loadMaintenanceStats()">
-                <div style="font-size:1.8rem;color:var(--gold)"><i class="fas fa-sync-alt"></i></div>
-                <div style="font-size:.8rem;color:var(--gray-600);margin-top:6px">اضغط لتحميل الإحصائيات</div>
+          <!-- Tab 1: حذف انتقائي -->
+          <div id="mpanel-selective" class="maint-panel">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px">
+
+              <div class="maint-card">
+                <div class="maint-card-title"><i class="fas fa-users" style="color:var(--blue-light)"></i> المستخدمون التجريبيون</div>
+                <div class="maint-card-desc">حذف كل المستخدمين عدا الأدمن الحالي</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <button class="btn btn-danger-outline btn-sm" onclick="confirmDelete('users')"><i class="fas fa-trash"></i> حذف الكل</button>
+                  <span id="stat-users" class="maint-count">—</span>
+                </div>
               </div>
+
+              <div class="maint-card">
+                <div class="maint-card-title"><i class="fas fa-receipt" style="color:var(--gold)"></i> الوصولات والمدفوعات</div>
+                <div class="maint-card-desc">حذف كل وصولات الخلاص والسجلات المالية</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <button class="btn btn-danger-outline btn-sm" onclick="confirmDelete('receipts')"><i class="fas fa-trash"></i> حذف الكل</button>
+                  <span id="stat-receipts" class="maint-count">—</span>
+                </div>
+              </div>
+
+              <div class="maint-card">
+                <div class="maint-card-title"><i class="fas fa-video" style="color:var(--purple)"></i> المحتوى التعليمي</div>
+                <div class="maint-card-desc">حذف كل الدروس والفروض من Firestore</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <button class="btn btn-danger-outline btn-sm" onclick="confirmDelete('videos')"><i class="fas fa-trash"></i> حذف الكل</button>
+                  <span id="stat-videos" class="maint-count">—</span>
+                </div>
+              </div>
+
+              <div class="maint-card">
+                <div class="maint-card-title"><i class="fas fa-calendar" style="color:var(--success)"></i> الحصص والحضور</div>
+                <div class="maint-card-desc">حذف كل الحصص المجدولة وسجلات الحضور</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <button class="btn btn-danger-outline btn-sm" onclick="confirmDelete('sessions')"><i class="fas fa-trash"></i> حذف الكل</button>
+                  <span id="stat-sessions" class="maint-count">—</span>
+                </div>
+              </div>
+
+              <div class="maint-card">
+                <div class="maint-card-title"><i class="fas fa-layer-group" style="color:var(--blue-dark)"></i> المجموعات والتوزيع</div>
+                <div class="maint-card-desc">حذف كل المجموعات وتوزيع التلاميذ</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <button class="btn btn-danger-outline btn-sm" onclick="confirmDelete('groups')"><i class="fas fa-trash"></i> حذف الكل</button>
+                  <span id="stat-groups" class="maint-count">—</span>
+                </div>
+              </div>
+
+              <div class="maint-card">
+                <div class="maint-card-title"><i class="fas fa-wallet" style="color:var(--gold)"></i> المحافظ المالية</div>
+                <div class="maint-card-desc">إعادة ضبط محافظ المدرسين إلى صفر</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <button class="btn btn-danger-outline btn-sm" onclick="confirmDelete('wallets')"><i class="fas fa-trash"></i> إعادة ضبط</button>
+                  <span id="stat-wallets" class="maint-count">—</span>
+                </div>
+              </div>
+
             </div>
           </div>
 
-          <!-- عمليات الحذف الانتقائية -->
-          <div style="font-weight:800;color:var(--blue-dark);margin-bottom:14px;font-size:.95rem">
-            <i class="fas fa-eraser" style="color:var(--danger)"></i> حذف انتقائي
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:28px">
+          <!-- Tab 2: حذف معطى واحد -->
+          <div id="mpanel-record" class="maint-panel" style="display:none">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
 
-            <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:12px;padding:16px">
-              <div style="font-weight:700;margin-bottom:6px"><i class="fas fa-users" style="color:var(--blue-light)"></i> المستخدمون التجريبيون</div>
-              <div style="font-size:.8rem;color:var(--gray-600);margin-bottom:12px">حذف كل المستخدمين عدا حساب الأدمن الحالي</div>
-              <button class="btn btn-danger-outline btn-sm" onclick="confirmDelete('users')">
-                <i class="fas fa-trash"></i> حذف المستخدمين
-              </button>
+              <div class="form-group">
+                <label>نوع المجموعة</label>
+                <select class="form-control" id="recordColSelect" onchange="loadRecordsList()">
+                  <option value="">اختر...</option>
+                  <option value="users">👥 المستخدمون</option>
+                  <option value="receipts">🧾 الوصولات</option>
+                  <option value="videos">🎬 المحتوى التعليمي</option>
+                  <option value="sessions">📅 الحصص</option>
+                  <option value="groups">👥 المجموعات</option>
+                  <option value="wallets">💰 المحافظ</option>
+                  <option value="parentChildren">🔗 روابط الأولياء</option>
+                  <option value="contacts">✉️ رسائل التواصل</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>بحث في النتائج</label>
+                <input type="text" class="form-control" id="recordSearchInput" placeholder="ابحث بالاسم أو المعرّف..." oninput="filterRecordsList()">
+              </div>
+
             </div>
 
-            <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:12px;padding:16px">
-              <div style="font-weight:700;margin-bottom:6px"><i class="fas fa-receipt" style="color:var(--gold)"></i> الوصولات والمدفوعات</div>
-              <div style="font-size:.8rem;color:var(--gray-600);margin-bottom:12px">حذف كل وصولات الخلاص والسجلات المالية</div>
-              <button class="btn btn-danger-outline btn-sm" onclick="confirmDelete('receipts')">
-                <i class="fas fa-trash"></i> حذف الوصولات
-              </button>
+            <div id="recordsListContainer" style="margin-top:8px">
+              <div class="empty-state" style="padding:30px 0"><i class="fas fa-search"></i><h3>اختر نوعاً لعرض السجلات</h3></div>
             </div>
-
-            <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:12px;padding:16px">
-              <div style="font-weight:700;margin-bottom:6px"><i class="fas fa-video" style="color:var(--purple)"></i> المحتوى التعليمي</div>
-              <div style="font-size:.8rem;color:var(--gray-600);margin-bottom:12px">حذف كل الدروس والفروض والملفات</div>
-              <button class="btn btn-danger-outline btn-sm" onclick="confirmDelete('videos')">
-                <i class="fas fa-trash"></i> حذف المحتوى
-              </button>
-            </div>
-
-            <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:12px;padding:16px">
-              <div style="font-weight:700;margin-bottom:6px"><i class="fas fa-calendar" style="color:var(--success)"></i> الحصص والجلسات</div>
-              <div style="font-size:.8rem;color:var(--gray-600);margin-bottom:12px">حذف كل الحصص المجدولة وسجلات الحضور</div>
-              <button class="btn btn-danger-outline btn-sm" onclick="confirmDelete('sessions')">
-                <i class="fas fa-trash"></i> حذف الحصص
-              </button>
-            </div>
-
-            <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:12px;padding:16px">
-              <div style="font-weight:700;margin-bottom:6px"><i class="fas fa-layer-group" style="color:var(--blue-dark)"></i> المجموعات</div>
-              <div style="font-size:.8rem;color:var(--gray-600);margin-bottom:12px">حذف كل المجموعات وتوزيع التلاميذ</div>
-              <button class="btn btn-danger-outline btn-sm" onclick="confirmDelete('groups')">
-                <i class="fas fa-trash"></i> حذف المجموعات
-              </button>
-            </div>
-
-            <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:12px;padding:16px">
-              <div style="font-weight:700;margin-bottom:6px"><i class="fas fa-wallet" style="color:var(--gold)"></i> المحافظ المالية</div>
-              <div style="font-size:.8rem;color:var(--gray-600);margin-bottom:12px">إعادة ضبط محافظ كل المدرسين إلى صفر</div>
-              <button class="btn btn-danger-outline btn-sm" onclick="confirmDelete('wallets')">
-                <i class="fas fa-trash"></i> إعادة ضبط المحافظ
-              </button>
-            </div>
-
           </div>
 
-          <!-- إعادة ضبط كاملة -->
-          <div style="background:rgba(239,68,68,.06);border:2px dashed rgba(239,68,68,.3);border-radius:12px;padding:20px">
-            <div style="font-weight:800;color:var(--danger);font-size:1rem;margin-bottom:8px">
-              <i class="fas fa-fire"></i> إعادة الضبط الكاملة
-            </div>
-            <div style="font-size:.85rem;color:var(--gray-600);margin-bottom:16px">
-              يحذف كل البيانات التجريبية دفعة واحدة — المستخدمين، الحصص، المحتوى، الوصولات، المجموعات، المحافظ.
-              حساب الأدمن الحالي محمي.
-            </div>
-            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <!-- Tab 3: إعادة ضبط كاملة -->
+          <div id="mpanel-full" class="maint-panel" style="display:none">
+            <div style="background:rgba(239,68,68,.06);border:2px dashed rgba(239,68,68,.3);border-radius:12px;padding:24px;max-width:500px;margin:0 auto;text-align:center">
+              <i class="fas fa-fire" style="font-size:2.5rem;color:var(--danger);margin-bottom:14px;display:block"></i>
+              <div style="font-weight:800;color:var(--danger);font-size:1.1rem;margin-bottom:8px">إعادة الضبط الكاملة</div>
+              <div style="font-size:.85rem;color:var(--gray-600);margin-bottom:20px">
+                يحذف كل البيانات دفعة واحدة:<br>
+                مستخدمون، حصص، محتوى، وصولات، مجموعات، محافظ<br>
+                <strong style="color:var(--danger)">حساب الأدمن الحالي محمي دائماً</strong>
+              </div>
               <input type="text" id="resetConfirmInput" class="form-control"
                 placeholder='اكتب "تأكيد" للمتابعة'
-                style="max-width:220px;border-color:var(--danger)">
-              <button class="btn btn-danger" onclick="fullReset()">
-                <i class="fas fa-exclamation-triangle"></i> إعادة الضبط الكاملة
+                style="text-align:center;margin-bottom:12px;border-color:var(--danger)">
+              <button class="btn btn-danger" style="width:100%" onclick="fullReset()">
+                <i class="fas fa-exclamation-triangle"></i> تنفيذ إعادة الضبط الكاملة
               </button>
-            </div>
-          </div>
-
-          <!-- سجل العمليات -->
-          <div style="margin-top:24px">
-            <div style="font-weight:800;color:var(--blue-dark);margin-bottom:10px;font-size:.9rem">
-              <i class="fas fa-history" style="color:var(--gray-400)"></i> سجل عمليات الحذف
-            </div>
-            <div id="maintenanceLog" style="background:var(--gray-900,#0f172a);border-radius:10px;padding:14px;font-family:monospace;font-size:.78rem;color:#94a3b8;min-height:60px;max-height:160px;overflow-y:auto">
-              <span style="color:#475569">// لا توجد عمليات بعد</span>
             </div>
           </div>
 
         </div>
       </div>
+
+      <!-- روابط خارجية -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fas fa-external-link-alt"></i> حذف يدوي من المنصات الخارجية</div>
+        </div>
+        <div style="padding:0 20px 20px">
+          <p style="font-size:.83rem;color:var(--gray-600);margin-bottom:16px">
+            Firebase Auth وCloudinary لا يمكن حذفهم من هنا لأسباب أمنية — استخدم الروابط أدناه مع التعليمات:
+          </p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">
+
+            <div class="maint-ext-card">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+                <div style="width:40px;height:40px;background:#f97316;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <i class="fas fa-fire" style="color:white;font-size:1.1rem"></i>
+                </div>
+                <div>
+                  <div style="font-weight:800;font-size:.9rem">Firebase Authentication</div>
+                  <div style="font-size:.75rem;color:var(--gray-400)">حذف حسابات المستخدمين</div>
+                </div>
+              </div>
+              <div style="font-size:.8rem;color:var(--gray-600);margin-bottom:12px;background:var(--gray-50);border-radius:8px;padding:10px">
+                <strong>الخطوات:</strong><br>
+                1. افتح Firebase Console<br>
+                2. اذهب لـ Authentication → Users<br>
+                3. حدد المستخدمين → Delete
+              </div>
+              <a href="https://console.firebase.google.com/project/masartamayoz/authentication/users" target="_blank" class="btn btn-primary btn-sm" style="width:100%;justify-content:center">
+                <i class="fas fa-external-link-alt"></i> فتح Firebase Auth
+              </a>
+            </div>
+
+            <div class="maint-ext-card">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+                <div style="width:40px;height:40px;background:#3448c5;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <i class="fas fa-database" style="color:white;font-size:1.1rem"></i>
+                </div>
+                <div>
+                  <div style="font-weight:800;font-size:.9rem">Firebase Firestore</div>
+                  <div style="font-size:.75rem;color:var(--gray-400)">مراجعة قاعدة البيانات</div>
+                </div>
+              </div>
+              <div style="font-size:.8rem;color:var(--gray-600);margin-bottom:12px;background:var(--gray-50);border-radius:8px;padding:10px">
+                <strong>الخطوات:</strong><br>
+                1. افتح Firestore Console<br>
+                2. راجع كل Collection<br>
+                3. احذف ما تريد يدوياً
+              </div>
+              <a href="https://console.firebase.google.com/project/masartamayoz/firestore/data" target="_blank" class="btn btn-primary btn-sm" style="width:100%;justify-content:center">
+                <i class="fas fa-external-link-alt"></i> فتح Firestore
+              </a>
+            </div>
+
+            <div class="maint-ext-card">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+                <div style="width:40px;height:40px;background:#3448c5;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <i class="fas fa-cloud" style="color:white;font-size:1.1rem"></i>
+                </div>
+                <div>
+                  <div style="font-weight:800;font-size:.9rem">Cloudinary</div>
+                  <div style="font-size:.75rem;color:var(--gray-400)">حذف الصور والـ PDF</div>
+                </div>
+              </div>
+              <div style="font-size:.8rem;color:var(--gray-600);margin-bottom:12px;background:var(--gray-50);border-radius:8px;padding:10px">
+                <strong>الخطوات:</strong><br>
+                1. افتح Media Library<br>
+                2. اختر مجلد <code>academy</code><br>
+                3. اضغط Select All → Delete
+              </div>
+              <a href="https://console.cloudinary.com/app/c-e499eac59fe62cd1874fec397da36a/assets/media_library/search?q=&view_mode=mosaic" target="_blank" class="btn btn-primary btn-sm" style="width:100%;justify-content:center">
+                <i class="fas fa-external-link-alt"></i> فتح Cloudinary
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- سجل العمليات -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fas fa-history"></i> سجل عمليات الحذف</div>
+          <button class="btn btn-outline btn-sm" onclick="$('maintenanceLog').innerHTML='<span style=color:#475569>// تم مسح السجل</span>'">
+            <i class="fas fa-times"></i> مسح السجل
+          </button>
+        </div>
+        <div style="padding:0 20px 20px">
+          <div id="maintenanceLog" style="background:#0f172a;border-radius:10px;padding:14px;font-family:monospace;font-size:.78rem;color:#94a3b8;min-height:60px;max-height:200px;overflow-y:auto">
+            <span style="color:#475569">// لا توجد عمليات بعد</span>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- PARENT PAGES -->
@@ -2215,6 +2371,92 @@ async function loadParentSessions() {
 
 // ══ MAINTENANCE PANEL ══
 
+window.switchMaintTab = function(tab, btn) {
+  document.querySelectorAll('.maint-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.maint-panel').forEach(p => p.style.display = 'none');
+  $(`mpanel-${tab}`).style.display = 'block';
+};
+
+let _recordsAll = [];
+
+window.loadRecordsList = async function() {
+  const col = $('recordColSelect').value;
+  const container = $('recordsListContainer');
+  if (!col) { container.innerHTML = `<div class="empty-state" style="padding:30px 0"><i class="fas fa-search"></i><h3>اختر نوعاً</h3></div>`; return; }
+  container.innerHTML = `<div class="empty-state" style="padding:20px 0"><i class="fas fa-spinner fa-spin"></i><h3>جاري التحميل...</h3></div>`;
+  try {
+    const snap = await getDocs(collection(db, col));
+    _recordsAll = [];
+    snap.forEach(d => _recordsAll.push({id: d.id, ...d.data()}));
+    renderRecordsList(_recordsAll, col);
+  } catch(e) {
+    container.innerHTML = `<div class="empty-state" style="padding:20px 0"><i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i><h3>${e.message}</h3></div>`;
+  }
+};
+
+function getRecordLabel(r, col) {
+  if (col==='users')    return {title:r.firstName?`${r.firstName} ${r.lastName||''}`.trim():(r.name||r.email||r.id), sub:`${r.email||''} • ${r.userType||'—'} • السنة ${r.level||'—'}`};
+  if (col==='receipts') return {title:r.name||r.userId||r.id, sub:`${r.plan||'—'} • ${r.status||'—'} • ${r.paymentMethod||'—'}`};
+  if (col==='videos')   return {title:r.title||r.id, sub:`السنة ${r.level||'—'} • ${r.type||'—'} • ${r.chapter||'—'}`};
+  if (col==='sessions') return {title:`${r.date||'—'} ${r.startTime||''}`, sub:`${r.groupId||'—'} • ${r.type||'—'} • ${r.status||'—'}`};
+  if (col==='groups')   return {title:r.name||r.id, sub:`${r.teacherName||'—'} • ${r.currentCount||0} تلميذ`};
+  if (col==='wallets')  return {title:r.id, sub:`رصيد: ${r.paid||0} د.ت`};
+  if (col==='parentChildren') return {title:r.childName||r.childEmail||r.childId||r.id, sub:`ولي: ${r.parentId||'—'}`};
+  if (col==='contacts') return {title:r.name||r.id, sub:`${r.email||''} • ${r.subject||'—'}`};
+  return {title:r.id, sub:JSON.stringify(r).slice(0,60)};
+}
+
+function renderRecordsList(records, col) {
+  const container = $('recordsListContainer');
+  if (!records.length) {
+    container.innerHTML = `<div class="empty-state" style="padding:30px 0"><i class="fas fa-folder-open"></i><h3>لا توجد سجلات</h3></div>`;
+    return;
+  }
+  container.innerHTML = `
+    <div style="margin-bottom:10px"><span style="font-size:.82rem;color:var(--gray-600)">${records.length} سجل</span></div>
+    <div style="max-height:400px;overflow-y:auto;padding-right:4px">
+      ${records.map(r => {
+        const lbl = getRecordLabel(r, col);
+        const isAdminRecord = col==='users' && r.id===CU.uid;
+        return `<div class="record-row">
+          <div class="record-info">
+            <h4>${lbl.title} ${isAdminRecord?'<span style="background:var(--danger);color:white;font-size:.65rem;padding:2px 6px;border-radius:6px">أنت</span>':''}</h4>
+            <p>${lbl.sub}</p>
+          </div>
+          ${isAdminRecord
+            ? `<span style="font-size:.75rem;color:var(--gray-400)">محمي</span>`
+            : `<button class="btn btn-danger-outline btn-sm" onclick="deleteSingleRecord('${col}','${r.id}','${lbl.title.replace(/'/g,"\\'")}')">
+                 <i class="fas fa-trash"></i>
+               </button>`}
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+window.filterRecordsList = function() {
+  const q = $('recordSearchInput').value.toLowerCase().trim();
+  const col = $('recordColSelect').value;
+  if (!q) { renderRecordsList(_recordsAll, col); return; }
+  renderRecordsList(_recordsAll.filter(r => JSON.stringify(r).toLowerCase().includes(q)), col);
+};
+
+window.deleteSingleRecord = async function(col, docId, label) {
+  if (!confirm(`حذف: ${label}?\nهذه العملية لا يمكن التراجع عنها.`)) return;
+  try {
+    await deleteDoc(doc(db, col, docId));
+    maintenanceLog(`✅ حُذف: ${label} من ${col}`, 'success');
+    toast(`تم حذف: ${label}`, 'danger');
+    _recordsAll = _recordsAll.filter(r => r.id !== docId);
+    renderRecordsList(_recordsAll, col);
+    const statEl = $(`stat-${col}`);
+    if (statEl) statEl.textContent = Math.max(0,(parseInt(statEl.textContent)||0)-1) + ' سجل';
+  } catch(e) {
+    maintenanceLog(`❌ خطأ: ${e.message}`, 'danger');
+    toast('خطأ: '+e.message, 'danger');
+  }
+};
+
 const MAINTENANCE_COLLECTIONS = {
   users:    { label:'المستخدمون',    icon:'fa-users',        color:'var(--blue-light)' },
   receipts: { label:'الوصولات',      icon:'fa-receipt',      color:'var(--gold)' },
@@ -2249,18 +2491,25 @@ window.loadMaintenanceStats = async function() {
     }));
 
     el.innerHTML = cols.map(c => {
-      const cfg = MAINTENANCE_COLLECTIONS[c] || { label:c, icon:'fa-database', color:'var(--gray-400)' };
+      const cfg = MAINTENANCE_COLLECTIONS[c] || {label:c, icon:'fa-database', color:'var(--gray-400)'};
       return `
         <div class="stat-card" style="text-align:center">
-          <div style="font-size:1.5rem;color:${cfg.color}"><i class="fas ${cfg.icon}"></i></div>
-          <div style="font-size:1.4rem;font-weight:800;color:var(--blue-dark);margin:6px 0">${counts[c]}</div>
-          <div style="font-size:.75rem;color:var(--gray-600)">${cfg.label}</div>
+          <div style="font-size:1.3rem;color:${cfg.color}"><i class="fas ${cfg.icon}"></i></div>
+          <div style="font-size:1.3rem;font-weight:800;color:var(--blue-dark);margin:4px 0">${counts[c]}</div>
+          <div style="font-size:.72rem;color:var(--gray-600)">${cfg.label}</div>
         </div>`;
     }).join('');
+
+    // تحديث شارات الإحصائيات في بطاقات الحذف الانتقائي
+    ['users','receipts','videos','sessions','groups','wallets'].forEach(c => {
+      const badge = $(`stat-${c}`);
+      if (badge) badge.textContent = (counts[c]||0) + ' سجل';
+    });
+
     maintenanceLog('تم تحميل الإحصائيات', 'info');
   } catch(e) {
     el.innerHTML = `<div style="color:var(--danger);font-size:.85rem">${e.message}</div>`;
-    maintenanceLog('خطأ: ' + e.message, 'danger');
+    maintenanceLog('خطأ: '+e.message, 'danger');
   }
 };
 
