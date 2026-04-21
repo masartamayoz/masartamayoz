@@ -1966,14 +1966,34 @@
   mobileNavClose.addEventListener('click', () => mobileNav.classList.remove('open'));
 
   // ── Auth state ──
-  onAuthStateChanged(auth, user => {
+  onAuthStateChanged(auth, async user => {
     if (user) {
+      // إذا المستخدم مسجّل وفتح index.html → وجّهه للداشبورد مباشرة
+      // إلا إذا كان قادماً من الداشبورد (مثلاً لإرسال وصل)
+      const fromDashboard = document.referrer.includes('dashboard.html');
+      if (!fromDashboard) {
+        window.location.href = 'dashboard.html';
+        return;
+      }
+
       authButtons.style.display = 'none';
       userSection.style.display = 'block';
-      const initial = (user.displayName || user.email).charAt(0).toUpperCase();
-      userAvatar.innerHTML = user.photoURL
-        ? `<img src="${user.photoURL}" alt="avatar">`
-        : initial;
+
+      // عرض الاسم الحقيقي من Firestore
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        const name = snap.exists() && snap.data().firstName
+          ? snap.data().firstName
+          : (user.displayName || user.email).split(' ')[0];
+        userAvatar.innerHTML = user.photoURL
+          ? `<img src="${user.photoURL}" alt="avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`
+          : name.charAt(0).toUpperCase();
+        // تحديث نص الترحيب في الهيدر إن وجد
+        const welcomeEl = document.getElementById('headerUserName');
+        if (welcomeEl) welcomeEl.textContent = name;
+      } catch {
+        userAvatar.innerHTML = (user.displayName || user.email).charAt(0).toUpperCase();
+      }
     } else {
       authButtons.style.display = 'flex';
       userSection.style.display = 'none';
@@ -2056,7 +2076,7 @@ document.getElementById('loginUserForm').addEventListener('submit', async e => {
     }
   });
 
-  // ── Google login (fixed) ──
+  // ── Google login ──
   document.getElementById('googleLogin').addEventListener('click', async () => {
     try {
       const provider = new GoogleAuthProvider();
@@ -2065,28 +2085,34 @@ document.getElementById('loginUserForm').addEventListener('submit', async e => {
       const { user } = await signInWithPopup(auth, provider);
       const userRef = doc(db, 'users', user.uid);
       const snap = await getDoc(userRef);
+
       if (!snap.exists()) {
-        // Split displayName into firstName and lastName
+        // مستخدم جديد — نسجّله كتلميذ افتراضياً ونوجّهه للداشبورد
+        // ليكمل بياناته من هناك
         const nameParts = (user.displayName || '').split(' ');
-        const firstName = nameParts[0] || '';
-        const lastName  = nameParts.slice(1).join(' ') || '';
         await setDoc(userRef, {
-          firstName, lastName,
-          email: user.email,
-          userType: 'student',
-          level: '',
-          phone: '',
+          firstName: nameParts[0] || '',
+          lastName:  nameParts.slice(1).join(' ') || '',
+          email:     user.email,
+          userType:  'student',
+          level:     '',
+          phone:     '',
           subscriptionStatus: 'inactive',
           createdAt: serverTimestamp()
         });
+        toast('مرحباً! تم تسجيلك. يرجى إكمال بياناتك من لوحة التحكم.', 'info');
       }
+
       closeModal();
       window.location.href = 'dashboard.html';
+
     } catch (err) {
       if (err.code === 'auth/popup-closed-by-user') {
-        // User closed popup - do nothing
+        // المستخدم أغلق النافذة — لا نفعل شيئاً
       } else if (err.code === 'auth/unauthorized-domain') {
         toast('يرجى إضافة النطاق في إعدادات Firebase Authentication', 'warning');
+      } else if (err.code === 'auth/cancelled-popup-request') {
+        // طلب مكرر — لا نفعل شيئاً
       } else {
         toast('خطأ في تسجيل الدخول بجوجل: ' + err.message, 'danger');
       }
