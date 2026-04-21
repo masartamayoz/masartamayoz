@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>من نحن — أكاديمية مسار التميز</title>
+  <meta name="description" content="تعرّف على أكاديمية مسار التميز، المنصة التعليمية التونسية المتخصصة في الرياضيات للسنوات السابعة والثامنة والتاسعة أساسي.">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root{--blue-dark:#0a1628;--blue-mid:#0d2147;--blue:#1a3a6e;--blue-light:#2563eb;--gold:#f59e0b;--gold-light:#fbbf24;--white:#ffffff;--gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;--gray-400:#94a3b8;--gray-600:#475569;--gray-800:#1e293b;--success:#10b981;--danger:#ef4444;--radius:12px;--shadow:0 4px 24px rgba(10,22,40,.12);--shadow-lg:0 12px 48px rgba(10,22,40,.18)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Tajawal',sans-serif;background:var(--gray-50);color:var(--gray-800);line-height:1.7;overflow-x:hidden}
+    a{text-decoration:none;color:inherit}
+    img{max-width:100%}
+    .container{max-width:1100px;margin:0 auto;padding:0 20px}
+
+    /* HEADER */
+    header{background:linear-gradient(135deg,var(--blue-dark),var(--blue-mid) 60%,var(--blue));padding:14px 0;position:sticky;top:0;z-index:900;box-shadow:0 2px 20px rgba(0,0,0,.25)}
+    .header-inner{display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .logo{display:flex;align-items:center;gap:12px}
+    .logo img{width:48px;height:48px;border-radius:10px;object-fit:contain;background:white;padding:4px}
+    .logo-text h1{font-size:1.1rem;font-weight:800;color:white;line-height:1.2}
+    .logo-text span{font-size:.72rem;color:var(--gold-light)}
+    .header-nav{display:flex;align-items:center;gap:6px}
+    .header-nav a{color:rgba(255,255,255,.85);font-size:.9rem;font-weight:500;padding:7px 14px;border-radius:8px;transition:all .2s}
+    .header-nav a:hover,.header-nav a.active{background:rgba(255,255,255,.1);color:white}
+    .header-nav a.active{background:rgba(255,255,255,.15);font-weight:700}
+    .btn-cta{background:var(--gold);border:none;color:var(--blue-dark);padding:8px 20px;border-radius:8px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s}
+    .btn-cta:hover{background:var(--gold-light);transform:translateY(-1px)}
+    .hamburger{display:none;background:none;border:none;cursor:pointer;color:white;font-size:1.2rem}
+
+    /* HERO */
+    .page-hero{background:linear-gradient(135deg,var(--blue-dark),var(--blue-mid));padding:72px 0;text-align:center;position:relative;overflow:hidden}
+    .page-hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:var(--gold-light);padding:6px 16px;border-radius:20px;font-size:.82rem;font-weight:700;margin-bottom:20px}
+    .page-hero h1{font-size:2.4rem;font-weight:900;color:white;margin-bottom:16px;line-height:1.3}
+    .page-hero h1 span{color:var(--gold)}
+    .page-hero p{font-size:1.05rem;color:rgba(255,255,255,.75);max-width:600px;margin:0 auto}
+    @media(max-width:768px){.page-hero h1{font-size:1.7rem}}
+
+    /* BREADCRUMB */
+    .breadcrumb{padding:14px 0;border-bottom:1px solid var(--gray-200);background:white}
+    .breadcrumb-inner{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--gray-400)}
+    .breadcrumb-inner a{color:var(--blue-light);font-weight:600}
+    .breadcrumb-inner a:hover{text-decoration:underline}
+
+    /* SECTIONS */
+    section{padding:64px 0}
+    .section-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(37,99,235,.08);color:var(--blue-light);padding:5px 14px;border-radius:20px;font-size:.8rem;font-weight:700;margin-bottom:12px}
+    .section-title{font-size:1.8rem;font-weight:800;color:var(--blue-dark);margin-bottom:14px;line-height:1.3}
+    .section-title span{color:var(--blue-light)}
+    .section-desc{font-size:.95rem;color:var(--gray-600);max-width:560px;line-height:1.8}
+
+    /* MISSION */
+    .mission-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+    .mission-visual{background:linear-gradient(135deg,var(--blue-dark),var(--blue));border-radius:24px;padding:40px;display:flex;flex-direction:column;gap:20px;position:relative;overflow:hidden}
+    .mission-visual::before{content:'';position:absolute;top:-40px;left:-40px;width:200px;height:200px;background:rgba(245,158,11,.08);border-radius:50%}
+    .mission-stat{display:flex;align-items:center;gap:16px;background:rgba(255,255,255,.06);border-radius:14px;padding:18px}
+    .mission-stat-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+    .mission-stat-num{font-size:1.6rem;font-weight:900;color:white}
+    .mission-stat-label{font-size:.8rem;color:rgba(255,255,255,.6)}
+    @media(max-width:768px){.mission-grid{grid-template-columns:1fr;gap:32px}}
+
+    /* VALUES */
+    .values-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+    .value-card{background:white;border:1px solid var(--gray-200);border-radius:16px;padding:28px;transition:all .25s;text-align:center}
+    .value-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:rgba(37,99,235,.2)}
+    .value-icon{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 16px}
+    .value-title{font-size:1rem;font-weight:800;color:var(--blue-dark);margin-bottom:8px}
+    .value-desc{font-size:.85rem;color:var(--gray-600);line-height:1.7}
+    @media(max-width:768px){.values-grid{grid-template-columns:1fr}}
+    @media(max-width:1024px){.values-grid{grid-template-columns:1fr 1fr}}
+
+    /* TEACHER */
+    .teacher-section{background:linear-gradient(135deg,var(--blue-dark),var(--blue-mid))}
+    .teacher-grid{display:grid;grid-template-columns:300px 1fr;gap:48px;align-items:start}
+    .teacher-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:32px;text-align:center}
+    .teacher-avatar{width:100px;height:100px;border-radius:50%;background:var(--gold);color:var(--blue-dark);display:flex;align-items:center;justify-content:center;font-size:2.2rem;font-weight:900;margin:0 auto 16px;border:4px solid rgba(255,255,255,.2)}
+    .teacher-name{font-size:1.2rem;font-weight:800;color:white;margin-bottom:6px}
+    .teacher-title{font-size:.85rem;color:var(--gold-light);margin-bottom:16px}
+    .teacher-badges{display:flex;flex-direction:column;gap:8px}
+    .teacher-badge{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border-radius:10px;padding:10px 14px;font-size:.82rem;color:rgba(255,255,255,.8)}
+    .teacher-content h2{font-size:1.8rem;font-weight:800;color:white;margin-bottom:16px;line-height:1.3}
+    .teacher-content h2 span{color:var(--gold)}
+    .teacher-content p{font-size:.95rem;color:rgba(255,255,255,.75);line-height:1.85;margin-bottom:20px}
+    .teacher-quote{background:rgba(245,158,11,.1);border-right:3px solid var(--gold);border-radius:0 12px 12px 0;padding:16px 20px;font-size:.95rem;color:rgba(255,255,255,.85);font-style:italic;margin-top:20px}
+    @media(max-width:768px){.teacher-grid{grid-template-columns:1fr}}
+
+    /* WHY */
+    .why-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+    .why-item{display:flex;gap:16px;align-items:flex-start;background:white;border:1px solid var(--gray-200);border-radius:14px;padding:20px;transition:all .2s}
+    .why-item:hover{border-color:rgba(37,99,235,.2);box-shadow:var(--shadow)}
+    .why-num{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.95rem;flex-shrink:0;background:var(--blue-light);color:white}
+    .why-text h4{font-size:.95rem;font-weight:700;color:var(--blue-dark);margin-bottom:4px}
+    .why-text p{font-size:.82rem;color:var(--gray-600)}
+    @media(max-width:768px){.why-grid{grid-template-columns:1fr}}
+
+    /* CTA */
+    .cta-section{background:linear-gradient(135deg,var(--blue-light),#1d4ed8);text-align:center;padding:72px 0}
+    .cta-section h2{font-size:2rem;font-weight:900;color:white;margin-bottom:14px}
+    .cta-section p{font-size:.95rem;color:rgba(255,255,255,.8);margin-bottom:28px}
+    .cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+    .btn-white{background:white;color:var(--blue-light);padding:13px 28px;border-radius:10px;font-weight:700;font-size:.95rem;border:none;cursor:pointer;font-family:inherit;transition:all .2s}
+    .btn-white:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.15)}
+    .btn-outline-white{background:transparent;color:white;padding:13px 28px;border-radius:10px;font-weight:700;font-size:.95rem;border:2px solid rgba(255,255,255,.5);cursor:pointer;font-family:inherit;transition:all .2s}
+    .btn-outline-white:hover{border-color:white;background:rgba(255,255,255,.1)}
+
+    /* FOOTER */
+    footer{background:var(--blue-dark);color:rgba(255,255,255,.7);padding:48px 0 24px}
+    .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;margin-bottom:36px}
+    .footer-brand p{font-size:.85rem;margin-top:12px;color:rgba(255,255,255,.55);line-height:1.7}
+    .footer-col h4{color:white;font-weight:700;margin-bottom:14px;font-size:.92rem}
+    .footer-col ul{list-style:none}
+    .footer-col li{margin-bottom:8px}
+    .footer-col a{font-size:.85rem;color:rgba(255,255,255,.55);transition:color .2s}
+    .footer-col a:hover{color:var(--gold)}
+    .footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;font-size:.82rem}
+    .social-links{display:flex;gap:10px}
+    .social-link{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);transition:all .2s}
+    .social-link:hover{background:var(--gold);color:var(--blue-dark)}
+    @media(max-width:768px){.footer-grid{grid-template-columns:1fr}.hamburger{display:block}.header-nav{display:none}}
+
+    /* MOBILE NAV */
+    .mobile-nav{position:fixed;inset:0;background:var(--blue-dark);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;transform:translateX(100%);transition:transform .3s}
+    .mobile-nav.open{transform:translateX(0)}
+    .mobile-nav a{font-size:1.2rem;font-weight:700;color:white}
+    .mobile-nav-close{position:absolute;top:20px;left:20px;background:none;border:none;color:white;font-size:1.4rem;cursor:pointer}
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <img src="assets/logo.png" alt="مسار التميز" onerror="this.style.display='none'">
+        <div class="logo-text">
+          <h1>أكاديمية مسار التميز</h1>
+          <span>التعليم الثانوي في تونس</span>
+        </div>
+      </a>
+      <nav class="header-nav">
+        <a href="index.html">الرئيسية</a>
+        <a href="about.html" class="active">من نحن</a>
+        <a href="courses.html">الدروس</a>
+        <a href="contact.html">تواصل معنا</a>
+      </nav>
+      <div class="header-actions">
+        <a href="dashboard.html"><button class="btn-cta"><i class="fas fa-tachometer-alt"></i> لوحتي</button></a>
+        <button class="hamburger" id="hamburger"><i class="fas fa-bars"></i></button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav" id="mobileNav">
+  <button class="mobile-nav-close" id="mobileNavClose"><i class="fas fa-times"></i></button>
+  <a href="index.html">الرئيسية</a>
+  <a href="about.html">من نحن</a>
+  <a href="courses.html">الدروس</a>
+  <a href="contact.html">تواصل معنا</a>
+  <a href="dashboard.html" style="color:var(--gold)">لوحتي</a>
+</div>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <div class="container">
+    <div class="breadcrumb-inner">
+      <a href="index.html">الرئيسية</a>
+      <i class="fas fa-chevron-left" style="font-size:.65rem"></i>
+      <span>من نحن</span>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="container">
+    <div class="hero-badge"><i class="fas fa-star"></i> منصة تعليمية تونسية</div>
+    <h1>نحن نؤمن بأن <span>كل تلميذ</span> يستحق<br>التعليم الأفضل</h1>
+    <p>أكاديمية مسار التميز — مشروع تعليمي تونسي يجمع بين جودة المحتوى وسهولة الوصول، مخصص لتلاميذ السنوات السابعة والثامنة والتاسعة أساسي.</p>
+  </div>
+</section>
+
+<!-- MISSION -->
+<section style="padding:72px 0">
+  <div class="container">
+    <div class="mission-grid">
+      <div>
+        <div class="section-tag"><i class="fas fa-bullseye"></i> رسالتنا</div>
+        <h2 class="section-title">نبني <span>جيلاً متميزاً</span><br>في الرياضيات</h2>
+        <p class="section-desc">
+          أسّسنا مسار التميز بهدف واحد واضح: تقديم تعليم رياضيات عالي الجودة لكل تلميذ تونسي، بغض النظر عن موقعه الجغرافي أو إمكانياته المادية.
+        </p>
+        <p class="section-desc" style="margin-top:14px">
+          نؤمن أن الفهم الحقيقي للرياضيات يُبنى خطوة بخطوة، مع مدرّس متخصص وبيئة تعليمية تفاعلية ومحتوى متكامل.
+        </p>
+        <div style="display:flex;gap:12px;margin-top:28px;flex-wrap:wrap">
+          <a href="index.html#pricing"><button class="btn-cta" style="border-radius:10px;padding:11px 24px"><i class="fas fa-tags"></i> اكتشف العروض</button></a>
+          <a href="contact.html"><button style="background:transparent;border:1.5px solid var(--gray-200);color:var(--gray-600);padding:11px 24px;border-radius:10px;font-family:inherit;font-weight:600;cursor:pointer;font-size:.9rem"><i class="fas fa-envelope"></i> تواصل معنا</button></a>
+        </div>
+      </div>
+      <div class="mission-visual">
+        <div class="mission-stat">
+          <div class="mission-stat-icon" style="background:rgba(245,158,11,.2)"><i class="fas fa-users" style="color:var(--gold)"></i></div>
+          <div>
+            <div class="mission-stat-num">+500</div>
+            <div class="mission-stat-label">تلميذ مستفيد</div>
+          </div>
+        </div>
+        <div class="mission-stat">
+          <div class="mission-stat-icon" style="background:rgba(16,185,129,.2)"><i class="fas fa-graduation-cap" style="color:#34d399"></i></div>
+          <div>
+            <div class="mission-stat-num">3</div>
+            <div class="mission-stat-label">مستويات دراسية (7 — 8 — 9)</div>
+          </div>
+        </div>
+        <div class="mission-stat">
+          <div class="mission-stat-icon" style="background:rgba(37,99,235,.2)"><i class="fas fa-video" style="color:#60a5fa"></i></div>
+          <div>
+            <div class="mission-stat-num">+200</div>
+            <div class="mission-stat-label">درس وفرض مسجّل</div>
+          </div>
+        </div>
+        <div class="mission-stat">
+          <div class="mission-stat-icon" style="background:rgba(139,92,246,.2)"><i class="fas fa-calendar-check" style="color:#a78bfa"></i></div>
+          <div>
+            <div class="mission-stat-num">حصتان</div>
+            <div class="mission-stat-label">أسبوعياً لكل مجموعة</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUES -->
+<section style="padding:64px 0;background:white">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:44px">
+      <div class="section-tag" style="justify-content:center"><i class="fas fa-heart"></i> قيمنا</div>
+      <h2 class="section-title" style="text-align:center">ما الذي يميّزنا؟</h2>
+    </div>
+    <div class="values-grid">
+      <div class="value-card">
+        <div class="value-icon" style="background:rgba(37,99,235,.1)"><i class="fas fa-award" style="color:var(--blue-light)"></i></div>
+        <div class="value-title">جودة المحتوى</div>
+        <div class="value-desc">دروس مُعدَّة بعناية فائقة تغطي كامل البرنامج الرسمي بأسلوب واضح ومبسّط يضمن الفهم العميق.</div>
+      </div>
+      <div class="value-card">
+        <div class="value-icon" style="background:rgba(245,158,11,.1)"><i class="fas fa-clock" style="color:var(--gold)"></i></div>
+        <div class="value-title">التعلم في أي وقت</div>
+        <div class="value-desc">سجّلاتنا متاحة على مدار الساعة — يتعلم التلميذ بالإيقاع الذي يناسبه ويُراجع الدروس كم مرة يشاء.</div>
+      </div>
+      <div class="value-card">
+        <div class="value-icon" style="background:rgba(16,185,129,.1)"><i class="fas fa-users" style="color:var(--success)"></i></div>
+        <div class="value-title">حصص تفاعلية مباشرة</div>
+        <div class="value-desc">مجموعات صغيرة لضمان الانتباه الكافي لكل تلميذ والتفاعل المباشر مع المدرّس وطرح الأسئلة.</div>
+      </div>
+      <div class="value-card">
+        <div class="value-icon" style="background:rgba(139,92,246,.1)"><i class="fas fa-file-pdf" style="color:#8b5cf6"></i></div>
+        <div class="value-title">موارد شاملة</div>
+        <div class="value-desc">فروض مراقبة وفروض تأليفية وسلاسل تمارين محلولة لكل مستوى — كل ما يحتاجه التلميذ في مكان واحد.</div>
+      </div>
+      <div class="value-card">
+        <div class="value-icon" style="background:rgba(239,68,68,.1)"><i class="fas fa-shield-alt" style="color:var(--danger)"></i></div>
+        <div class="value-title">شفافية ومصداقية</div>
+        <div class="value-desc">أسعار واضحة بدون تكاليف خفية، وإمكانية متابعة الولي لأداء منظوره في كل وقت.</div>
+      </div>
+      <div class="value-card">
+        <div class="value-icon" style="background:rgba(245,158,11,.1)"><i class="fas fa-mobile-alt" style="color:var(--gold)"></i></div>
+        <div class="value-title">سهولة الوصول</div>
+        <div class="value-desc">المنصة متاحة على كل الأجهزة — هاتف، تابلت، حاسوب — بدون تطبيق ولا تثبيت.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEACHER -->
+<section class="teacher-section" style="padding:72px 0">
+  <div class="container">
+    <div class="teacher-grid">
+      <div class="teacher-card">
+        <div class="teacher-avatar">ص</div>
+        <div class="teacher-name">صالح أمين</div>
+        <div class="teacher-title">مؤسّس ومدرّس الرياضيات</div>
+        <div class="teacher-badges">
+          <div class="teacher-badge"><i class="fas fa-graduation-cap" style="color:var(--gold)"></i> أستاذ رياضيات متخصص</div>
+          <div class="teacher-badge"><i class="fas fa-chalkboard-teacher" style="color:#60a5fa"></i> +10 سنوات خبرة</div>
+          <div class="teacher-badge"><i class="fas fa-map-marker-alt" style="color:#f87171"></i> تونس</div>
+          <div class="teacher-badge"><i class="fas fa-users" style="color:#34d399"></i> +500 تلميذ استفادوا</div>
+        </div>
+      </div>
+      <div class="teacher-content">
+        <div class="section-tag" style="background:rgba(255,255,255,.08);color:var(--gold-light)"><i class="fas fa-user-tie"></i> كلمة المؤسّس</div>
+        <h2>رحلة بدأت بشغف <span>التعليم</span></h2>
+        <p>
+          بدأت مسيرتي في التدريس منذ أكثر من عشر سنوات، وفي كل يوم أرى تلاميذ موهوبين يعانون بسبب غياب شرح واضح ومبسّط. كان هذا الدافع الأساسي لتأسيس أكاديمية مسار التميز.
+        </p>
+        <p>
+          أردت بناء منصة لا تكتفي بنقل المعلومة، بل تبني الفهم الحقيقي الذي يجعل التلميذ قادراً على حل أي مسألة بثقة. لذلك صممنا كل درس بعناية فائقة، وأتحنا الموارد لكل مستوى.
+        </p>
+        <div class="teacher-quote">
+          "هدفي ليس فقط أن ينجح التلميذ في الامتحان — هدفي أن يُحبّ الرياضيات ويفهم جماليّتها."
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY -->
+<section style="padding:72px 0">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:44px">
+      <div class="section-tag" style="justify-content:center"><i class="fas fa-check-circle"></i> لماذا نحن؟</div>
+      <h2 class="section-title" style="text-align:center">أسباب تجعل <span>مسار التميز</span> الخيار الأمثل</h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-item">
+        <div class="why-num">1</div>
+        <div class="why-text">
+          <h4>محتوى مُصمَّم خصيصاً للبرنامج التونسي</h4>
+          <p>كل الدروس والفروض متوافقة مع المنهج الرسمي التونسي للسنوات السابعة والثامنة والتاسعة أساسي.</p>
+        </div>
+      </div>
+      <div class="why-item">
+        <div class="why-num">2</div>
+        <div class="why-text">
+          <h4>متابعة مستمرة من الولي</h4>
+          <p>يمكن لولي الأمر متابعة حصص منظوره ومعرفة جدوله الأسبوعي وسجل حضوره في أي وقت.</p>
+        </div>
+      </div>
+      <div class="why-item">
+        <div class="why-num">3</div>
+        <div class="why-text">
+          <h4>سعر في متناول الجميع</h4>
+          <p>اشتراك سنوي بسعر رمزي يشمل كل الدروس والفروض والحصص المسجّلة — أفضل استثمار في مستقبل أبنائك.</p>
+        </div>
+      </div>
+      <div class="why-item">
+        <div class="why-num">4</div>
+        <div class="why-text">
+          <h4>حصص مباشرة أسبوعية</h4>
+          <p>حصتان أسبوعيتان تفاعليتان مع المدرّس، مع إمكانية مشاهدة التسجيل لاحقاً في أي وقت.</p>
+        </div>
+      </div>
+      <div class="why-item">
+        <div class="why-num">5</div>
+        <div class="why-text">
+          <h4>تواصل سريع ومباشر</h4>
+          <p>دعم عبر واتساب وفيسبوك لحل أي مشكلة تقنية أو استفسار في أسرع وقت ممكن.</p>
+        </div>
+      </div>
+      <div class="why-item">
+        <div class="why-num">6</div>
+        <div class="why-text">
+          <h4>بدون التزامات طويلة</h4>
+          <p>اشتراك مرن يناسب احتياجاتك — تسجيلات سنوية أو حصص مباشرة، كل خيار بسعره المناسب.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <h2>مستعد للانضمام إلى <span style="color:var(--gold)">مسار التميز؟</span></h2>
+    <p>سجّل الآن مجاناً واكتشف عالماً من التعليم الجيد</p>
+    <div class="cta-btns">
+      <a href="index.html"><button class="btn-white"><i class="fas fa-user-plus"></i> سجّل الآن مجاناً</button></a>
+      <a href="contact.html"><button class="btn-outline-white"><i class="fas fa-envelope"></i> تواصل معنا</button></a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">
+          <img src="assets/logo.png" alt="مسار التميز" style="width:40px;height:40px" onerror="this.style.display='none'">
+          <div class="logo-text"><h1 style="font-size:.95rem">أكاديمية مسار التميز</h1></div>
+        </div>
+        <p>منصة تعليمية تونسية متخصصة في تعليم الرياضيات للمرحلة الإعدادية.</p>
+      </div>
+      <div class="footer-col">
+        <h4>روابط سريعة</h4>
+        <ul>
+          <li><a href="index.html">الرئيسية</a></li>
+          <li><a href="about.html">من نحن</a></li>
+          <li><a href="courses.html">الدروس</a></li>
+          <li><a href="contact.html">تواصل معنا</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>تواصل معنا</h4>
+        <ul>
+          <li><a href="https://www.facebook.com/masartamayoz" target="_blank">فيسبوك</a></li>
+          <li><a href="https://www.youtube.com/@masartamayoz" target="_blank">يوتيوب</a></li>
+          <li><a href="https://t.me/masartamayoz" target="_blank">تيليغرام</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 أكاديمية مسار التميز. جميع الحقوق محفوظة.</span>
+      <div class="social-links">
+        <a href="https://www.facebook.com/masartamayoz" target="_blank" class="social-link"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://www.youtube.com/@masartamayoz" target="_blank" class="social-link"><i class="fab fa-youtube"></i></a>
+        <a href="https://t.me/masartamayoz" target="_blank" class="social-link"><i class="fab fa-telegram-plane"></i></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('hamburger').addEventListener('click', () => document.getElementById('mobileNav').classList.add('open'));
+  document.getElementById('mobileNavClose').addEventListener('click', () => document.getElementById('mobileNav').classList.remove('open'));
+</script>
+</body>
+</html>
