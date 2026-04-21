@@ -2019,16 +2019,39 @@
     setTimeout(() => { t.style.cssText='opacity:0;transition:opacity .3s'; setTimeout(()=>t.remove(),300); }, 3500);
   }
 
+  // ── ترجمة أخطاء Firebase ──
+  function authError(code) {
+    const errors = {
+      'auth/invalid-login-credentials':  'البريد الإلكتروني أو كلمة المرور غير صحيحة',
+      'auth/invalid-credential':         'البريد الإلكتروني أو كلمة المرور غير صحيحة',
+      'auth/user-not-found':             'لا يوجد حساب بهذا البريد الإلكتروني',
+      'auth/wrong-password':             'كلمة المرور غير صحيحة',
+      'auth/email-already-in-use':       'هذا البريد مسجّل مسبقاً — يرجى تسجيل الدخول',
+      'auth/weak-password':              'كلمة المرور ضعيفة — يجب أن تكون 6 أحرف على الأقل',
+      'auth/invalid-email':              'صيغة البريد الإلكتروني غير صحيحة',
+      'auth/too-many-requests':          'تم حظر الحساب مؤقتاً — حاول لاحقاً أو أعد تعيين كلمة المرور',
+      'auth/network-request-failed':     'خطأ في الاتصال بالإنترنت — تحقق من اتصالك',
+      'auth/user-disabled':              'هذا الحساب موقوف — تواصل مع الدعم',
+      'auth/popup-blocked':              'تم حظر النافذة المنبثقة — يرجى السماح لها في المتصفح',
+      'auth/unauthorized-domain':        'النطاق غير مصرح به في إعدادات Firebase',
+    };
+    return errors[code] || 'حدث خطأ غير متوقع — حاول مرة أخرى';
+  }
+
 document.getElementById('loginUserForm').addEventListener('submit', async e => {
     e.preventDefault();
     const email    = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled = true; btn.textContent = 'جاري الدخول...';
     try {
       await signInWithEmailAndPassword(auth, email, password);
       closeModal();
       window.location.href = 'dashboard.html';
     } catch (err) {
-      toast('خطأ في تسجيل الدخول: ' + err.message, 'danger');
+      toast(authError(err.code), 'danger');
+    } finally {
+      btn.disabled = false; btn.textContent = 'تسجيل الدخول';
     }
   });
 
@@ -2066,11 +2089,7 @@ document.getElementById('loginUserForm').addEventListener('submit', async e => {
       e.target.reset();
       window.location.href = 'dashboard.html';
     } catch (err) {
-      if (err.code === 'auth/email-already-in-use') {
-        toast('هذا البريد مسجّل مسبقاً — يرجى تسجيل الدخول', 'warning');
-      } else {
-        toast('خطأ: ' + err.message, 'danger');
-      }
+      toast(authError(err.code), 'danger');
     } finally {
       btn.disabled = false; btn.textContent = 'إنشاء الحساب';
     }
@@ -2114,7 +2133,7 @@ document.getElementById('loginUserForm').addEventListener('submit', async e => {
       } else if (err.code === 'auth/cancelled-popup-request') {
         // طلب مكرر — لا نفعل شيئاً
       } else {
-        toast('خطأ في تسجيل الدخول بجوجل: ' + err.message, 'danger');
+        toast(authError(err.code), 'danger');
       }
     }
   });
