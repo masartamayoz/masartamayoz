@@ -367,7 +367,30 @@
 
   // ── Auth ──
   onAuthStateChanged(auth, async user => {
-    if (!user) { window.location.href = 'index.html'; return; }
+    // السماح لغير المسجّلين بالدخول لرؤية الدروس المجانية
+    if (!user) {
+      isSubscribed  = false;
+      allowedLevels = [7, 8, 9];
+      currentLevel  = 7;
+      $('sidebarAvatar').textContent = '؟';
+      $('sidebarName').textContent   = 'زائر';
+      $('sidebarRole').textContent   = 'غير مسجّل';
+      $('sidebarSubBadge').className = 'sub-badge sub-inactive';
+      $('sidebarSubBadge').textContent = '✗ غير مسجّل';
+      lockLevelBtns([7,8,9]);
+      document.querySelectorAll('.level-btn').forEach(b=>b.classList.remove('active'));
+      const lb = $(`lvl${currentLevel}`); if(lb) lb.classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+      const nb = $(`nav-${currentType}`); if(nb) nb.classList.add('active');
+      $('lockedPage').style.display  = 'none';
+      $('contentView').style.display = 'block';
+      await loadContent();
+      updateCounts();
+      $('loadingScreen').style.display = 'none';
+      $('appContainer').style.display  = 'flex';
+      return;
+    }
+
     CU = user;
 
     try {
@@ -515,6 +538,13 @@
     const hasPdfSol  = !!item.pdfSolution;
     const multiVideo = videos.length > 1;
     const cfg = TYPE_CFG[item.type] || TYPE_CFG.lesson;
+    const canAccess  = isSubscribed || item.isFree;
+
+    const freeBadge = item.isFree && !isSubscribed
+      ? `<span style="position:absolute;top:8px;left:8px;background:var(--gold);color:var(--blue-dark);font-size:.68rem;font-weight:800;padding:3px 8px;border-radius:20px;z-index:2"><i class="fas fa-unlock"></i> مجاني</span>`
+      : item.isFree
+      ? `<span style="position:absolute;top:8px;left:8px;background:rgba(16,185,129,.9);color:white;font-size:.68rem;font-weight:800;padding:3px 8px;border-radius:20px;z-index:2"><i class="fas fa-unlock"></i> مجاني</span>`
+      : '';
 
     const thumbHTML = firstYtId
       ? `<div class="card-thumb" onclick="openViewer('${item.id}','video')">
@@ -522,8 +552,10 @@
            <div class="thumb-overlay"><div class="play-btn"><i class="fas fa-play"></i></div></div>
            <span class="card-type-badge" style="background:${cfg.color};color:${cfg.iconColor};border:1px solid ${cfg.iconColor}40"><i class="fas ${cfg.icon}"></i></span>
            ${multiVideo?`<span class="multi-badge"><i class="fas fa-layer-group"></i> ${videos.length} حصص</span>`:''}
+           ${freeBadge}
+           ${!canAccess?`<div class="locked-overlay" onclick="goSubscribe()"><i class="fas fa-lock"></i><p>اشترك للمشاهدة</p></div>`:''}
          </div>`
-      : `<div class="card-thumb-empty"><i class="fas fa-file-pdf" style="color:var(--danger)"></i><span>PDF فقط</span></div>`;
+      : `<div class="card-thumb-empty">${freeBadge}<i class="fas fa-file-pdf" style="color:var(--danger)"></i><span>PDF فقط</span></div>`;
 
     return `
       <div class="content-card">
@@ -531,19 +563,21 @@
         <div class="card-body">
           <div class="card-meta">
             <span class="badge-level">السنة ${item.level}</span>
+            ${item.isFree?`<span style="background:rgba(245,158,11,.1);color:var(--gold);padding:3px 9px;border-radius:20px;font-size:.7rem;font-weight:700"><i class="fas fa-unlock"></i> مجاني</span>`:''}
             ${item.section?`<span class="badge-section">${SECTIONS[item.section]||item.section}</span>`:''}
             ${item.chapter?`<span class="badge-chapter">${item.chapter}</span>`:''}
           </div>
           <div class="card-title">${item.title}</div>
           ${item.desc?`<div class="card-desc">${item.desc}</div>`:''}
           <div class="card-actions">
-            ${firstYtId?`<button class="btn-watch" onclick="openViewer('${item.id}','video')">
-              <i class="fas fa-play"></i>${multiVideo?`مشاهدة (${videos.length} حصص)`:'مشاهدة الدرس'}
+            ${firstYtId?`<button class="btn-watch" onclick="${canAccess?`openViewer('${item.id}','video')`:'goSubscribe()'}">
+              <i class="fas fa-${canAccess?'play':'lock'}"></i>
+              ${canAccess?(multiVideo?`مشاهدة (${videos.length} حصص)`:'مشاهدة الدرس'):'اشترك للمشاهدة'}
             </button>`:''}
-            ${hasPdfText?`<button class="btn-pdf" style="background:rgba(239,68,68,.1);color:var(--danger)" onclick="openViewer('${item.id}','pdf-text')">
+            ${hasPdfText&&canAccess?`<button class="btn-pdf" style="background:rgba(239,68,68,.1);color:var(--danger)" onclick="openViewer('${item.id}','pdf-text')">
               <i class="fas fa-file-pdf"></i> النص
             </button>`:''}
-            ${hasPdfSol?`<button class="btn-pdf" style="background:rgba(16,185,129,.1);color:var(--success)" onclick="openViewer('${item.id}','pdf-sol')">
+            ${hasPdfSol&&canAccess?`<button class="btn-pdf" style="background:rgba(16,185,129,.1);color:var(--success)" onclick="openViewer('${item.id}','pdf-sol')">
               <i class="fas fa-file-pdf"></i> الإصلاح
             </button>`:''}
           </div>
@@ -594,6 +628,9 @@
     const item = allContent.find(i => i.id === itemId);
     if (!item) return;
 
+    const canAccess = isSubscribed || item.isFree;
+    if (!canAccess) { goSubscribe(); return; }
+
     const videos     = item.videoUrls?.length ? item.videoUrls : (item.videoUrl?[{url:item.videoUrl,title:''}]:[]);
     const hasPdfText = !!item.pdfText;
     const hasPdfSol  = !!item.pdfSolution;
@@ -630,14 +667,18 @@
     if (hasPdfSol)  acts.push(`<a href="${item.pdfSolution}" download target="_blank" class="viewer-btn viewer-btn-sol"><i class="fas fa-download"></i> تحميل الإصلاح</a>`);
     $('viewerActions').innerHTML = acts.join('');
 
-    if (tab === 'video'    && !hasVideo)   tab = hasPdfText ? 'pdf-text' : 'pdf-sol';
-    if (tab === 'pdf-text' && !hasPdfText) tab = hasVideo ? 'video' : 'pdf-sol';
-    if (tab === 'pdf-sol'  && !hasPdfSol)  tab = hasVideo ? 'video' : 'pdf-text';
+    if (tab==='video'    && !hasVideo)   tab = hasPdfText?'pdf-text':'pdf-sol';
+    if (tab==='pdf-text' && !hasPdfText) tab = hasVideo?'video':'pdf-sol';
+    if (tab==='pdf-sol'  && !hasPdfSol)  tab = hasVideo?'video':'pdf-text';
 
     switchViewerTab(tab);
     $('viewerModal').classList.add('open');
     document.body.style.overflow = 'hidden';
   };
+
+  function goSubscribe() {
+    window.location.href = 'dashboard.html';
+  }
 
   window.switchVideo = function(index) {
     const ytId = extractYTId(currentVideos[index]?.url||'');

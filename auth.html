@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تسجيل الدخول — أكاديمية مسار التميز</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root{--blue-dark:#0a1628;--blue-mid:#0d2147;--blue-light:#2563eb;--gold:#f59e0b;--gold-light:#fbbf24;--gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;--gray-400:#94a3b8;--gray-600:#475569;--success:#10b981;--danger:#ef4444;--warning:#f59e0b}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Tajawal',sans-serif;background:var(--gray-50);min-height:100vh;display:flex;flex-direction:column}
+    a{text-decoration:none;color:inherit}
+
+    /* LAYOUT */
+    .auth-wrapper{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:100vh}
+
+    /* LEFT — decorative */
+    .auth-left{background:linear-gradient(135deg,var(--blue-dark),var(--blue-mid));display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px;position:relative;overflow:hidden}
+    .auth-left::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+    .auth-left-logo{display:flex;align-items:center;gap:14px;margin-bottom:48px}
+    .auth-left-logo img{width:56px;height:56px;border-radius:14px;background:white;padding:6px;object-fit:contain}
+    .auth-left-logo div h1{font-size:1.1rem;font-weight:800;color:white}
+    .auth-left-logo div span{font-size:.72rem;color:var(--gold-light);display:block;margin-top:2px}
+    .auth-left-content{text-align:center;max-width:340px}
+    .auth-left-content h2{font-size:1.8rem;font-weight:900;color:white;margin-bottom:14px;line-height:1.3}
+    .auth-left-content h2 span{color:var(--gold)}
+    .auth-left-content p{font-size:.92rem;color:rgba(255,255,255,.65);line-height:1.75;margin-bottom:32px}
+    .auth-features{display:flex;flex-direction:column;gap:12px;text-align:right}
+    .auth-feature{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.06);border-radius:12px;padding:12px 16px}
+    .auth-feature-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem}
+    .auth-feature p{font-size:.85rem;color:rgba(255,255,255,.8);font-weight:500}
+    .auth-left-footer{margin-top:auto;font-size:.78rem;color:rgba(255,255,255,.3)}
+
+    /* RIGHT — form */
+    .auth-right{display:flex;align-items:center;justify-content:center;padding:40px 32px;background:white}
+    .auth-form-box{width:100%;max-width:420px}
+    .auth-form-header{margin-bottom:28px}
+    .auth-form-header h2{font-size:1.5rem;font-weight:800;color:var(--blue-dark);margin-bottom:6px}
+    .auth-form-header p{font-size:.88rem;color:var(--gray-600)}
+
+    /* TABS */
+    .auth-tabs{display:flex;background:var(--gray-100);border-radius:12px;padding:4px;margin-bottom:24px;gap:4px}
+    .auth-tab{flex:1;padding:9px;border-radius:9px;border:none;background:none;font-family:inherit;font-size:.88rem;font-weight:600;color:var(--gray-600);cursor:pointer;transition:all .2s}
+    .auth-tab.active{background:white;color:var(--blue-light);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+
+    /* FORM */
+    .form-group{margin-bottom:16px}
+    .form-group label{display:block;font-size:.83rem;font-weight:700;color:var(--gray-600);margin-bottom:6px}
+    .form-control{width:100%;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:10px;font-family:inherit;font-size:.9rem;background:var(--gray-50);transition:all .2s;outline:none;color:var(--blue-dark)}
+    .form-control:focus{border-color:var(--blue-light);background:white;box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+    .form-control.error{border-color:var(--danger)}
+    .input-wrapper{position:relative}
+    .input-wrapper .form-control{padding-left:42px}
+    .input-toggle{position:absolute;left:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:.9rem;transition:color .2s}
+    .input-toggle:hover{color:var(--blue-light)}
+
+    /* SELECT GRID */
+    .select-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+    .select-card{border:1.5px solid var(--gray-200);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all .2s;background:var(--gray-50)}
+    .select-card:hover{border-color:var(--blue-light);background:rgba(37,99,235,.04)}
+    .select-card.active{border-color:var(--blue-light);background:rgba(37,99,235,.08);color:var(--blue-light)}
+    .select-card i{font-size:1.2rem;margin-bottom:4px;display:block}
+    .select-card span{font-size:.8rem;font-weight:700}
+    .select-label{font-size:.83rem;font-weight:700;color:var(--gray-600);margin-bottom:8px;display:block}
+
+    /* LEVEL BTNS */
+    .level-btns{display:flex;gap:8px;margin-bottom:16px}
+    .level-btn{flex:1;padding:10px;border:1.5px solid var(--gray-200);border-radius:10px;background:var(--gray-50);font-family:inherit;font-size:.85rem;font-weight:700;color:var(--gray-600);cursor:pointer;transition:all .2s}
+    .level-btn.active{border-color:var(--blue-light);background:rgba(37,99,235,.08);color:var(--blue-light)}
+
+    /* BTN */
+    .btn-primary{width:100%;padding:13px;background:var(--blue-light);color:white;border:none;border-radius:10px;font-family:inherit;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px}
+    .btn-primary:hover{background:#1d4ed8;transform:translateY(-1px)}
+    .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    .btn-google{width:100%;padding:12px;background:white;color:var(--blue-dark);border:1.5px solid var(--gray-200);border-radius:10px;font-family:inherit;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px}
+    .btn-google:hover{border-color:var(--blue-light);background:var(--gray-50)}
+    .divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--gray-400);font-size:.82rem}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--gray-200)}
+    .forgot-link{text-align:left;margin-top:-10px;margin-bottom:14px}
+    .forgot-link a{font-size:.82rem;color:var(--blue-light);font-weight:600}
+    .forgot-link a:hover{text-decoration:underline}
+
+    /* TOAST */
+    #toastContainer{position:fixed;bottom:20px;left:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+    .toast{display:flex;align-items:center;gap:10px;padding:12px 18px;border-radius:12px;font-size:.88rem;font-weight:600;color:white;box-shadow:0 4px 16px rgba(0,0,0,.2);animation:toastIn .3s ease;min-width:240px}
+    @keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .toast-success{background:var(--success)}.toast-danger{background:var(--danger)}.toast-warning{background:var(--warning);color:var(--blue-dark)}.toast-info{background:var(--blue-light)}
+
+    /* BACK LINK */
+    .back-link{display:inline-flex;align-items:center;gap:6px;font-size:.83rem;color:var(--gray-600);margin-bottom:24px;transition:color .2s}
+    .back-link:hover{color:var(--blue-light)}
+
+    /* RESPONSIVE */
+    @media(max-width:768px){
+      .auth-wrapper{grid-template-columns:1fr}
+      .auth-left{display:none}
+      .auth-right{padding:28px 20px;align-items:flex-start;padding-top:40px}
+    }
+  </style>
+</head>
+<body>
+
+<div class="auth-wrapper">
+
+  <!-- LEFT -->
+  <div class="auth-left">
+    <div class="auth-left-logo">
+      <img src="assets/logo.png" alt="مسار التميز" onerror="this.style.display='none'">
+      <div>
+        <h1>أكاديمية مسار التميز</h1>
+        <span>التعليم الثانوي في تونس</span>
+      </div>
+    </div>
+    <div class="auth-left-content">
+      <h2>منصتك لتعلم <span>الرياضيات</span> بشكل احترافي</h2>
+      <p>دروس مسجّلة، حصص مباشرة، وفروض محلولة لكل المستويات الإعدادية.</p>
+      <div class="auth-features">
+        <div class="auth-feature">
+          <div class="auth-feature-icon" style="background:rgba(245,158,11,.15)"><i class="fas fa-video" style="color:var(--gold)"></i></div>
+          <p>دروس فيديو لكل المقررات</p>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon" style="background:rgba(16,185,129,.15)"><i class="fas fa-users" style="color:#34d399"></i></div>
+          <p>حصص مباشرة أسبوعية</p>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon" style="background:rgba(37,99,235,.15)"><i class="fas fa-file-pdf" style="color:#60a5fa"></i></div>
+          <p>فروض وسلاسل تمارين محلولة</p>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon" style="background:rgba(139,92,246,.15)"><i class="fas fa-shield-alt" style="color:#a78bfa"></i></div>
+          <p>متابعة الولي لمنظوره</p>
+        </div>
+      </div>
+    </div>
+    <div class="auth-left-footer">© 2026 أكاديمية مسار التميز</div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="auth-right">
+    <div class="auth-form-box">
+      <a href="index.html" class="back-link"><i class="fas fa-arrow-right"></i> العودة للرئيسية</a>
+
+      <div class="auth-form-header">
+        <h2 id="formTitle">مرحباً بك 👋</h2>
+        <p id="formSubtitle">سجّل دخولك للوصول إلى دروسك</p>
+      </div>
+
+      <!-- TABS -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">تسجيل الدخول</button>
+        <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">إنشاء حساب</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div id="loginForm">
+        <div class="form-group">
+          <label>البريد الإلكتروني</label>
+          <input type="email" class="form-control" id="loginEmail" placeholder="example@gmail.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label>كلمة المرور</label>
+          <div class="input-wrapper">
+            <input type="password" class="form-control" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+            <button class="input-toggle" type="button" onclick="togglePass('loginPassword',this)"><i class="fas fa-eye-slash"></i></button>
+          </div>
+        </div>
+        <div class="forgot-link"><a href="#" onclick="forgotPassword()">نسيت كلمة المرور؟</a></div>
+        <button class="btn-primary" id="loginBtn" onclick="doLogin()">
+          <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+        </button>
+        <div class="divider">أو</div>
+        <button class="btn-google" onclick="doGoogle()">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          المتابعة بـ Google
+        </button>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div id="registerForm" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group">
+            <label>الاسم</label>
+            <input type="text" class="form-control" id="regFirstName" placeholder="محمد">
+          </div>
+          <div class="form-group">
+            <label>اللقب</label>
+            <input type="text" class="form-control" id="regLastName" placeholder="بن علي">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>البريد الإلكتروني</label>
+          <input type="email" class="form-control" id="regEmail" placeholder="example@gmail.com">
+        </div>
+        <div class="form-group">
+          <label>رقم الهاتف</label>
+          <input type="tel" class="form-control" id="regPhone" placeholder="2X XXX XXX">
+        </div>
+
+        <!-- نوع الحساب -->
+        <span class="select-label">نوع الحساب</span>
+        <div class="select-grid" id="roleGrid">
+          <div class="select-card active" onclick="selectRole('student',this)">
+            <i class="fas fa-user-graduate" style="color:var(--success)"></i>
+            <span>تلميذ</span>
+          </div>
+          <div class="select-card" onclick="selectRole('parent',this)">
+            <i class="fas fa-user-friends" style="color:var(--blue-light)"></i>
+            <span>ولي أمر</span>
+          </div>
+        </div>
+
+        <!-- المستوى (للتلميذ فقط) -->
+        <div id="levelSection">
+          <span class="select-label">المستوى الدراسي</span>
+          <div class="level-btns">
+            <button class="level-btn active" onclick="selectLevel('7',this)">السنة 7</button>
+            <button class="level-btn" onclick="selectLevel('8',this)">السنة 8</button>
+            <button class="level-btn" onclick="selectLevel('9',this)">السنة 9</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>كلمة المرور</label>
+          <div class="input-wrapper">
+            <input type="password" class="form-control" id="regPassword" placeholder="6 أحرف على الأقل">
+            <button class="input-toggle" type="button" onclick="togglePass('regPassword',this)"><i class="fas fa-eye-slash"></i></button>
+          </div>
+        </div>
+        <button class="btn-primary" id="registerBtn" onclick="doRegister()">
+          <i class="fas fa-user-plus"></i> إنشاء الحساب
+        </button>
+        <div class="divider">أو</div>
+        <button class="btn-google" onclick="doGoogle()">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          التسجيل بـ Google
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer"></div>
+
+<script type="module">
+  import { initializeApp }           from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+           createUserWithEmailAndPassword, signInWithPopup,
+           GoogleAuthProvider, sendPasswordResetEmail, updateProfile }
+    from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js';
+  import { getFirestore, doc, getDoc, setDoc, serverTimestamp }
+    from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAF_ktwHXPw6gDkoolCI77XeB_NGHTmAFA",
+    authDomain: "masartamayoz.firebaseapp.com",
+    projectId: "masartamayoz",
+    storageBucket: "masartamayoz.firebasestorage.app",
+    messagingSenderId: "589955939618",
+    appId: "1:589955939618:web:728ddeb7027b2becd1f97b"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+  const $    = id => document.getElementById(id);
+
+  let selectedRole  = 'student';
+  let selectedLevel = '7';
+
+  // إذا المستخدم مسجّل → وجّهه للداشبورد
+  onAuthStateChanged(auth, user => {
+    if (user) window.location.href = 'dashboard.html';
+  });
+
+  // ── Toast ──
+  function toast(msg, type='info') {
+    const c = $('toastContainer');
+    const t = document.createElement('div');
+    t.className = `toast toast-${type}`;
+    const icons={success:'check-circle',danger:'exclamation-circle',warning:'exclamation-triangle',info:'info-circle'};
+    t.innerHTML = `<i class="fas fa-${icons[type]}"></i> ${msg}`;
+    c.appendChild(t);
+    setTimeout(()=>{t.style.cssText='opacity:0;transition:opacity .3s';setTimeout(()=>t.remove(),300);},3200);
+  }
+
+  // ── Error translator ──
+  function authError(code) {
+    const e = {
+      'auth/invalid-login-credentials': 'البريد أو كلمة المرور غير صحيحة',
+      'auth/invalid-credential':        'البريد أو كلمة المرور غير صحيحة',
+      'auth/user-not-found':            'لا يوجد حساب بهذا البريد',
+      'auth/wrong-password':            'كلمة المرور غير صحيحة',
+      'auth/email-already-in-use':      'هذا البريد مسجّل مسبقاً — سجّل دخولك',
+      'auth/weak-password':             'كلمة المرور ضعيفة — 6 أحرف على الأقل',
+      'auth/invalid-email':             'صيغة البريد غير صحيحة',
+      'auth/too-many-requests':         'تم حظر الحساب مؤقتاً — حاول لاحقاً',
+      'auth/network-request-failed':    'خطأ في الاتصال — تحقق من الإنترنت',
+    };
+    return e[code] || 'حدث خطأ غير متوقع — حاول مرة أخرى';
+  }
+
+  // ── Tabs ──
+  window.switchTab = function(tab) {
+    $('tabLogin').classList.toggle('active', tab==='login');
+    $('tabRegister').classList.toggle('active', tab==='register');
+    $('loginForm').style.display    = tab==='login'    ? 'block' : 'none';
+    $('registerForm').style.display = tab==='register' ? 'block' : 'none';
+    $('formTitle').textContent    = tab==='login' ? 'مرحباً بك 👋' : 'إنشاء حساب جديد';
+    $('formSubtitle').textContent = tab==='login' ? 'سجّل دخولك للوصول إلى دروسك' : 'أنشئ حسابك مجاناً الآن';
+  };
+
+  // ── Role & Level ──
+  window.selectRole = function(role, el) {
+    selectedRole = role;
+    document.querySelectorAll('#roleGrid .select-card').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active');
+    $('levelSection').style.display = role==='student' ? 'block' : 'none';
+  };
+
+  window.selectLevel = function(level, btn) {
+    selectedLevel = level;
+    document.querySelectorAll('.level-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  };
+
+  window.togglePass = function(id, btn) {
+    const input = $(id);
+    const isPass = input.type==='password';
+    input.type = isPass ? 'text' : 'password';
+    btn.querySelector('i').className = isPass ? 'fas fa-eye' : 'fas fa-eye-slash';
+  };
+
+  // ── Login ──
+  window.doLogin = async function() {
+    const email = $('loginEmail').value.trim();
+    const pass  = $('loginPassword').value;
+    if (!email || !pass) { toast('يرجى إدخال البريد وكلمة المرور','warning'); return; }
+    const btn = $('loginBtn');
+    btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> جاري الدخول...';
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+      window.location.href = 'dashboard.html';
+    } catch(err) {
+      toast(authError(err.code),'danger');
+    } finally { btn.disabled=false; btn.innerHTML='<i class="fas fa-sign-in-alt"></i> تسجيل الدخول'; }
+  };
+
+  // ── Register ──
+  window.doRegister = async function() {
+    const firstName = $('regFirstName').value.trim();
+    const lastName  = $('regLastName').value.trim();
+    const email     = $('regEmail').value.trim();
+    const phone     = $('regPhone').value.trim();
+    const pass      = $('regPassword').value;
+    if (!firstName||!lastName||!email||!pass) { toast('يرجى إكمال جميع الحقول','warning'); return; }
+    if (pass.length<6) { toast('كلمة المرور ضعيفة — 6 أحرف على الأقل','warning'); return; }
+    const btn = $('registerBtn');
+    btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> جاري الإنشاء...';
+    try {
+      const {user} = await createUserWithEmailAndPassword(auth, email, pass);
+      await updateProfile(user, {displayName:`${firstName} ${lastName}`});
+      await setDoc(doc(db,'users',user.uid), {
+        firstName, lastName, email, phone,
+        userType: selectedRole,
+        level:    selectedRole==='student' ? selectedLevel : '',
+        subscriptionStatus: 'inactive',
+        createdAt: serverTimestamp()
+      });
+      window.location.href = 'dashboard.html';
+    } catch(err) {
+      toast(authError(err.code),'danger');
+    } finally { btn.disabled=false; btn.innerHTML='<i class="fas fa-user-plus"></i> إنشاء الحساب'; }
+  };
+
+  // ── Google ──
+  window.doGoogle = async function() {
+    try {
+      const {user} = await signInWithPopup(auth, new GoogleAuthProvider());
+      const snap = await getDoc(doc(db,'users',user.uid));
+      if (!snap.exists()) {
+        const p = (user.displayName||'').split(' ');
+        await setDoc(doc(db,'users',user.uid), {
+          firstName: p[0]||'', lastName: p.slice(1).join(' ')||'',
+          email: user.email, phone: '',
+          userType: 'student', level: '',
+          subscriptionStatus: 'inactive',
+          createdAt: serverTimestamp()
+        });
+      }
+      window.location.href = 'dashboard.html';
+    } catch(err) {
+      if (!['auth/popup-closed-by-user','auth/cancelled-popup-request'].includes(err.code))
+        toast(authError(err.code),'danger');
+    }
+  };
+
+  // ── Forgot password ──
+  window.forgotPassword = async function() {
+    const email = $('loginEmail').value.trim();
+    if (!email) { toast('أدخل بريدك الإلكتروني أولاً','warning'); return; }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      toast('تم إرسال رابط إعادة التعيين لبريدك','success');
+    } catch(err) { toast(authError(err.code),'danger'); }
+  };
+
+  // Enter key support
+  document.addEventListener('keydown', e => {
+    if (e.key==='Enter') {
+      if ($('loginForm').style.display!=='none') doLogin();
+      else doRegister();
+    }
+  });
+</script>
+</body>
+</html>

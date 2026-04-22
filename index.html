@@ -1285,14 +1285,15 @@
       <a href="#about">عن المنصة</a>
       <a href="#levels">المستويات</a>
       <a href="#pricing">العروض</a>
-      <a href="#how">كيف تشترك</a>
+      <a href="courses.html">الدروس</a>
+      <a href="about.html">من نحن</a>
       <a href="contact.html">تواصل معنا</a>
     </nav>
 
     <div class="header-actions">
       <div id="authButtons">
-        <button class="btn-login" id="loginBtn">تسجيل الدخول</button>
-        <button class="btn-signup" id="signupBtn">إنشاء حساب</button>
+        <a href="auth.html"><button class="btn-login" id="loginBtn">تسجيل الدخول</button></a>
+        <a href="auth.html#register"><button class="btn-signup" id="signupBtn">إنشاء حساب</button></a>
       </div>
       <div class="user-section" id="userSection">
         <div class="user-avatar" id="userAvatar">
@@ -1300,7 +1301,8 @@
         </div>
         <div class="user-dropdown-menu" id="dropdownMenu">
           <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> لوحة التحكم</a>
-          <a href="courses.html"><i class="fas fa-book"></i> دوراتي</a>
+          <a href="courses.html"><i class="fas fa-book"></i> دروسي</a>
+          <a href="profile.html"><i class="fas fa-user-circle"></i> ملفي الشخصي</a>
           <div class="divider" style="margin:4px 0;height:1px;background:var(--gray-200)"></div>
           <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
         </div>
@@ -1316,8 +1318,10 @@
   <a href="#about">عن المنصة</a>
   <a href="#levels">المستويات</a>
   <a href="#pricing">العروض</a>
-  <a href="#how">كيف تشترك</a>
+  <a href="courses.html">الدروس</a>
+  <a href="about.html">من نحن</a>
   <a href="contact.html">تواصل معنا</a>
+  <a href="auth.html" style="color:var(--gold)">تسجيل الدخول</a>
 </div>
 
 <!-- ══════ HERO ══════ -->
@@ -1332,7 +1336,7 @@
         <h1>تعلّم <span>الرياضيات</span> مع أفضل المدرّسين</h1>
         <p>حصص مباشرة وتسجيلات عالية الجودة للسنوات السابعة والثامنة والتاسعة أساسي. تعليم تفاعلي يضمن لك النجاح.</p>
         <div class="hero-actions">
-          <button class="btn-hero-primary" onclick="document.getElementById('signupBtn').click()">
+          <button class="btn-hero-primary" onclick="window.location.href='auth.html'">
             <i class="fas fa-rocket"></i>
             ابدأ الآن مجاناً
           </button>
@@ -1667,7 +1671,7 @@
     <div class="cta-content">
       <h2>ابدأ رحلتك نحو <span>التميز</span> اليوم</h2>
       <p>انضم لمئات الطلاب الذين يتعلمون مع أفضل المدرسين في تونس</p>
-      <button class="btn-hero-primary" onclick="document.getElementById('signupBtn').click()" style="margin:0 auto">
+      <button class="btn-hero-primary" onclick="window.location.href='auth.html'" style="margin:0 auto">
         <i class="fas fa-user-plus"></i>
         أنشئ حسابك الآن — مجاناً
       </button>
@@ -1941,13 +1945,7 @@
 
   function closeModal() { authModal.classList.remove('open'); }
 
-  loginBtn.addEventListener('click', () => openModal('login'));
-  signupBtn.addEventListener('click', () => openModal('register'));
-  modalClose.addEventListener('click', closeModal);
-  authModal.addEventListener('click', e => { if (e.target === authModal) closeModal(); });
-
-  loginTab.addEventListener('click', () => openModal('login'));
-  registerTab.addEventListener('click', () => openModal('register'));
+  // الـ modal انتقل لـ auth.html — الأزرار أصبحت روابط مباشرة
 
   // ── Receipt modal ──
   window.openReceiptModal = function(plan) {
@@ -1966,34 +1964,14 @@
   mobileNavClose.addEventListener('click', () => mobileNav.classList.remove('open'));
 
   // ── Auth state ──
-  onAuthStateChanged(auth, async user => {
+  onAuthStateChanged(auth, user => {
     if (user) {
-      // إذا المستخدم مسجّل وفتح index.html → وجّهه للداشبورد مباشرة
-      // إلا إذا كان قادماً من الداشبورد (مثلاً لإرسال وصل)
-      const fromDashboard = document.referrer.includes('dashboard.html');
-      if (!fromDashboard) {
-        window.location.href = 'dashboard.html';
-        return;
-      }
-
       authButtons.style.display = 'none';
       userSection.style.display = 'block';
-
-      // عرض الاسم الحقيقي من Firestore
-      try {
-        const snap = await getDoc(doc(db, 'users', user.uid));
-        const name = snap.exists() && snap.data().firstName
-          ? snap.data().firstName
-          : (user.displayName || user.email).split(' ')[0];
-        userAvatar.innerHTML = user.photoURL
-          ? `<img src="${user.photoURL}" alt="avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`
-          : name.charAt(0).toUpperCase();
-        // تحديث نص الترحيب في الهيدر إن وجد
-        const welcomeEl = document.getElementById('headerUserName');
-        if (welcomeEl) welcomeEl.textContent = name;
-      } catch {
-        userAvatar.innerHTML = (user.displayName || user.email).charAt(0).toUpperCase();
-      }
+      const initial = (user.displayName || user.email).charAt(0).toUpperCase();
+      userAvatar.innerHTML = user.photoURL
+        ? `<img src="${user.photoURL}" alt="avatar">`
+        : initial;
     } else {
       authButtons.style.display = 'flex';
       userSection.style.display = 'none';
@@ -2019,39 +1997,16 @@
     setTimeout(() => { t.style.cssText='opacity:0;transition:opacity .3s'; setTimeout(()=>t.remove(),300); }, 3500);
   }
 
-  // ── ترجمة أخطاء Firebase ──
-  function authError(code) {
-    const errors = {
-      'auth/invalid-login-credentials':  'البريد الإلكتروني أو كلمة المرور غير صحيحة',
-      'auth/invalid-credential':         'البريد الإلكتروني أو كلمة المرور غير صحيحة',
-      'auth/user-not-found':             'لا يوجد حساب بهذا البريد الإلكتروني',
-      'auth/wrong-password':             'كلمة المرور غير صحيحة',
-      'auth/email-already-in-use':       'هذا البريد مسجّل مسبقاً — يرجى تسجيل الدخول',
-      'auth/weak-password':              'كلمة المرور ضعيفة — يجب أن تكون 6 أحرف على الأقل',
-      'auth/invalid-email':              'صيغة البريد الإلكتروني غير صحيحة',
-      'auth/too-many-requests':          'تم حظر الحساب مؤقتاً — حاول لاحقاً أو أعد تعيين كلمة المرور',
-      'auth/network-request-failed':     'خطأ في الاتصال بالإنترنت — تحقق من اتصالك',
-      'auth/user-disabled':              'هذا الحساب موقوف — تواصل مع الدعم',
-      'auth/popup-blocked':              'تم حظر النافذة المنبثقة — يرجى السماح لها في المتصفح',
-      'auth/unauthorized-domain':        'النطاق غير مصرح به في إعدادات Firebase',
-    };
-    return errors[code] || 'حدث خطأ غير متوقع — حاول مرة أخرى';
-  }
-
 document.getElementById('loginUserForm').addEventListener('submit', async e => {
     e.preventDefault();
     const email    = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
-    const btn = e.target.querySelector('button[type="submit"]');
-    btn.disabled = true; btn.textContent = 'جاري الدخول...';
     try {
       await signInWithEmailAndPassword(auth, email, password);
       closeModal();
       window.location.href = 'dashboard.html';
     } catch (err) {
-      toast(authError(err.code), 'danger');
-    } finally {
-      btn.disabled = false; btn.textContent = 'تسجيل الدخول';
+      toast('خطأ في تسجيل الدخول: ' + err.message, 'danger');
     }
   });
 
@@ -2089,13 +2044,17 @@ document.getElementById('loginUserForm').addEventListener('submit', async e => {
       e.target.reset();
       window.location.href = 'dashboard.html';
     } catch (err) {
-      toast(authError(err.code), 'danger');
+      if (err.code === 'auth/email-already-in-use') {
+        toast('هذا البريد مسجّل مسبقاً — يرجى تسجيل الدخول', 'warning');
+      } else {
+        toast('خطأ: ' + err.message, 'danger');
+      }
     } finally {
       btn.disabled = false; btn.textContent = 'إنشاء الحساب';
     }
   });
 
-  // ── Google login ──
+  // ── Google login (fixed) ──
   document.getElementById('googleLogin').addEventListener('click', async () => {
     try {
       const provider = new GoogleAuthProvider();
@@ -2104,36 +2063,30 @@ document.getElementById('loginUserForm').addEventListener('submit', async e => {
       const { user } = await signInWithPopup(auth, provider);
       const userRef = doc(db, 'users', user.uid);
       const snap = await getDoc(userRef);
-
       if (!snap.exists()) {
-        // مستخدم جديد — نسجّله كتلميذ افتراضياً ونوجّهه للداشبورد
-        // ليكمل بياناته من هناك
+        // Split displayName into firstName and lastName
         const nameParts = (user.displayName || '').split(' ');
+        const firstName = nameParts[0] || '';
+        const lastName  = nameParts.slice(1).join(' ') || '';
         await setDoc(userRef, {
-          firstName: nameParts[0] || '',
-          lastName:  nameParts.slice(1).join(' ') || '',
-          email:     user.email,
-          userType:  'student',
-          level:     '',
-          phone:     '',
+          firstName, lastName,
+          email: user.email,
+          userType: 'student',
+          level: '',
+          phone: '',
           subscriptionStatus: 'inactive',
           createdAt: serverTimestamp()
         });
-        toast('مرحباً! تم تسجيلك. يرجى إكمال بياناتك من لوحة التحكم.', 'info');
       }
-
       closeModal();
       window.location.href = 'dashboard.html';
-
     } catch (err) {
       if (err.code === 'auth/popup-closed-by-user') {
-        // المستخدم أغلق النافذة — لا نفعل شيئاً
+        // User closed popup - do nothing
       } else if (err.code === 'auth/unauthorized-domain') {
         toast('يرجى إضافة النطاق في إعدادات Firebase Authentication', 'warning');
-      } else if (err.code === 'auth/cancelled-popup-request') {
-        // طلب مكرر — لا نفعل شيئاً
       } else {
-        toast(authError(err.code), 'danger');
+        toast('خطأ في تسجيل الدخول بجوجل: ' + err.message, 'danger');
       }
     }
   });
@@ -2166,7 +2119,7 @@ document.getElementById('loginUserForm').addEventListener('submit', async e => {
   document.getElementById('receiptForm').addEventListener('submit', async e => {
     e.preventDefault();
     const user = auth.currentUser;
-    if (!user) { toast('يجب تسجيل الدخول أولاً!', 'warning'); openModal('login'); return; }
+    if (!user) { toast('يجب تسجيل الدخول أولاً!', 'warning'); window.location.href='auth.html'; return; }
 
     const name     = document.getElementById('receiptName').value;
     const email    = document.getElementById('receiptEmail').value;
