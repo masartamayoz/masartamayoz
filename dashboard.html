@@ -1470,8 +1470,34 @@ onAuthStateChanged(auth, async user => {
   if (!user) { window.location.href = 'index.html'; return; }
   CU = user;
   const snap = await getDoc(doc(db, 'users', user.uid));
-  if (!snap.exists()) { window.location.href = 'index.html'; return; }
-  CUD = snap.data();
+
+  if (!snap.exists()) {
+    // المستخدم موجود في Auth لكن بياناته محذوفة من Firestore
+    // نُنشئها تلقائياً من بيانات Auth
+    const nameParts = (user.displayName || '').split(' ');
+    const autoData = {
+      firstName: nameParts[0] || user.email.split('@')[0],
+      lastName:  nameParts.slice(1).join(' ') || '',
+      email:     user.email,
+      phone:     '',
+      userType:  'student',
+      level:     '7',
+      subscriptionStatus: 'inactive',
+      createdAt: serverTimestamp()
+    };
+    try {
+      await setDoc(doc(db, 'users', user.uid), autoData);
+      CUD = autoData;
+      toast('تم إنشاء ملفك الشخصي تلقائياً — يرجى تحديث بياناتك', 'warning');
+    } catch(err) {
+      // إذا فشل إنشاء البيانات → أرسله لـ auth.html لإعادة التسجيل
+      window.location.href = 'auth.html?reason=missing-profile';
+      return;
+    }
+  } else {
+    CUD = snap.data();
+  }
+
   initDashboard();
 });
 

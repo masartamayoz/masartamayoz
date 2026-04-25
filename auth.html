@@ -424,11 +424,18 @@
     }
   });
 
-  // ── قراءة الـ hash من الرابط ──
-  // مثال: auth.html#register → يفتح تبويب التسجيل مباشرة
-  const hash = window.location.hash;
+  // ── قراءة الـ hash والـ params من الرابط ──
+  const hash   = window.location.hash;
+  const params = new URLSearchParams(window.location.search);
+
   if (hash === '#register') switchTab('register');
   else if (hash === '#login') switchTab('login');
+
+  // حالة: بيانات المستخدم محذوفة من Firestore
+  if (params.get('reason') === 'missing-profile') {
+    switchTab('register');
+    toast('يبدو أن ملفك الشخصي غير مكتمل — يرجى إعادة التسجيل', 'warning');
+  }
 </script>
 </body>
 </html>
