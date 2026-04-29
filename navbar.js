@@ -1,77 +1,63 @@
 /**
  * navbar.js — Shared Navigation Component
  * أكاديمية مسار التميز
- * يُضاف في كل الصفحات: <script src="navbar.js"></script>
+ * يُضاف في الصفحات التي ليس فيها قائمة تنقل خاصة
  */
 
-(async function() {
-  // Firebase check
-  const PAGES = {
-    'index.html':     'الرئيسية',
-    'courses.html':   'الدروس',
-    'about.html':     'من نحن',
-    'contact.html':   'تواصل معنا',
-    'dashboard.html': 'لوحة التحكم',
-    'profile.html':   'ملفي الشخصي',
-    'auth.html':      'تسجيل الدخول',
-  };
-
+(function() {
+  // الصفحات التي لها قائمة خاصة بها — لا نضيف navbar.js فيها
+  const EXCLUDED = ['index.html', 'courses.html', 'dashboard.html', 'auth.html'];
   const currentPage = window.location.pathname.split('/').pop() || 'index.html';
 
-  // Inject shared topbar into pages that have header
+  if (EXCLUDED.includes(currentPage)) return;
+
+  // تحقق إضافي — إذا كان هناك nav-item أو header-nav موجود مسبقاً لا نضيف شيئاً
   const header = document.querySelector('header');
   if (!header) return;
+  if (header.querySelector('.header-nav, .nav-item, .shared-nav')) return;
 
-  // Add nav links to header if not already present
   const headerInner = header.querySelector('.header-inner');
   if (!headerInner) return;
 
-  // Check if nav already exists
-  if (header.querySelector('.shared-nav')) return;
-
-  const nav = document.createElement('nav');
-  nav.className = 'shared-nav';
-  nav.style.cssText = 'display:flex;align-items:center;gap:4px';
-
-  const links = [
-    { href:'index.html',   icon:'fa-home',         label:'الرئيسية' },
-    { href:'courses.html', icon:'fa-book-open',     label:'الدروس' },
-    { href:'about.html',   icon:'fa-info-circle',   label:'من نحن' },
-    { href:'contact.html', icon:'fa-envelope',      label:'تواصل معنا' },
+  const LINKS = [
+    { href:'index.html',     icon:'fa-home',       label:'الرئيسية' },
+    { href:'courses.html',   icon:'fa-book-open',  label:'الدروس'   },
+    { href:'about.html',     icon:'fa-info-circle',label:'من نحن'   },
+    { href:'contact.html',   icon:'fa-envelope',   label:'تواصل معنا'},
+    { href:'dashboard.html', icon:'fa-tachometer-alt', label:'لوحتي'},
   ];
 
-  links.forEach(l => {
-    const a = document.createElement('a');
-    const isActive = currentPage === l.href;
-    a.href = l.href;
-    a.innerHTML = `<i class="fas ${l.icon}"></i> <span class="nav-label">${l.label}</span>`;
-    a.style.cssText = `
-      color:${isActive ? '#fbbf24' : 'rgba(255,255,255,.8)'};
-      font-size:.82rem; font-weight:${isActive ? '700' : '500'};
-      padding:6px 12px; border-radius:8px; display:flex; align-items:center; gap:6px;
-      text-decoration:none; transition:all .2s;
-      ${isActive ? 'background:rgba(255,255,255,.1);' : ''}
-    `;
-    a.onmouseover = () => { if (!isActive) { a.style.background='rgba(255,255,255,.08)'; a.style.color='white'; } };
-    a.onmouseout  = () => { if (!isActive) { a.style.background=''; a.style.color='rgba(255,255,255,.8)'; } };
-    nav.appendChild(a);
-  });
-
-  // Insert nav before the action buttons
-  const actionDiv = headerInner.lastElementChild;
-  headerInner.insertBefore(nav, actionDiv);
-
-  // Mobile: hide labels on small screens
   const style = document.createElement('style');
   style.textContent = `
-    @media(max-width:768px) {
-      .shared-nav .nav-label { display:none; }
-      .shared-nav a { padding:6px 8px; }
+    .shared-nav { display:flex; align-items:center; gap:4px; }
+    .shared-nav a {
+      color:rgba(255,255,255,.8); font-size:.85rem; font-weight:500;
+      padding:7px 12px; border-radius:8px;
+      display:flex; align-items:center; gap:6px;
+      text-decoration:none; transition:all .2s;
+      white-space:nowrap;
     }
-    @media(max-width:480px) {
-      .shared-nav { display:none !important; }
-    }
+    .shared-nav a:hover { background:rgba(255,255,255,.1); color:white; }
+    .shared-nav a.active { background:rgba(255,255,255,.12); color:#fbbf24; font-weight:700; }
+    @media(max-width:900px) { .shared-nav span { display:none; } }
+    @media(max-width:600px) { .shared-nav { display:none; } }
   `;
   document.head.appendChild(style);
 
+  const nav = document.createElement('nav');
+  nav.className = 'shared-nav';
+
+  LINKS.forEach(l => {
+    const isActive = currentPage === l.href;
+    const a = document.createElement('a');
+    a.href = l.href;
+    a.className = isActive ? 'active' : '';
+    a.innerHTML = `<i class="fas ${l.icon}"></i><span>${l.label}</span>`;
+    nav.appendChild(a);
+  });
+
+  // أضف القائمة قبل آخر عنصر في الهيدر
+  const lastChild = headerInner.lastElementChild;
+  headerInner.insertBefore(nav, lastChild);
 })();
+
