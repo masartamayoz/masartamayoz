@@ -1542,7 +1542,7 @@
           <li><i class="fas fa-check"></i> تصحيح تمارين</li>
           <li><i class="fas fa-check"></i> متابعة ولي الأمر</li>
         </ul>
-        <a href="auth.html#register" class="btn-plan btn-plan-gold">احجز الآن</a>
+        <button onclick="openReceiptModal('trimester1')" class="btn-plan btn-plan-gold">احجز الآن</button>
       </div>
 
       <!-- ثلاثي 2 -->
@@ -1560,7 +1560,7 @@
           <li><i class="fas fa-check"></i> تصحيح تمارين</li>
           <li><i class="fas fa-check"></i> متابعة ولي الأمر</li>
         </ul>
-        <a href="auth.html#register" class="btn-plan btn-plan-outline">احجز الآن</a>
+        <button onclick="openReceiptModal('trimester2')" class="btn-plan btn-plan-outline">احجز الآن</button>
       </div>
 
       <!-- ثلاثي 3 -->
@@ -1578,7 +1578,7 @@
           <li><i class="fas fa-check"></i> تصحيح تمارين</li>
           <li><i class="fas fa-check"></i> متابعة ولي الأمر</li>
         </ul>
-        <a href="auth.html#register" class="btn-plan btn-plan-outline">احجز الآن</a>
+        <button onclick="openReceiptModal('trimester3')" class="btn-plan btn-plan-outline">احجز الآن</button>
       </div>
 
       <!-- شهري -->
@@ -1596,7 +1596,7 @@
           <li><i class="fas fa-check"></i> مرونة تامة</li>
           <li><i class="fas fa-check"></i> ~8 حصص</li>
         </ul>
-        <a href="auth.html#register" class="btn-plan btn-plan-outline">احجز الآن</a>
+        <button onclick="openReceiptModal('monthly')" class="btn-plan btn-plan-outline">احجز الآن</button>
       </div>
 
       <!-- مراجعة أوت -->
@@ -1613,13 +1613,13 @@
           <li style="color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.1)"><i class="fas fa-check" style="color:#c4b5fd"></i> مراجعة شاملة</li>
           <li style="color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.1)"><i class="fas fa-check" style="color:#c4b5fd"></i> التسجيلات مجاناً</li>
         </ul>
-        <a href="auth.html#register" class="btn-plan" style="background:#8b5cf6;color:white;border:none">احجز الآن</a>
+        <button onclick="openReceiptModal('august')" class="btn-plan" style="background:#8b5cf6;color:white;border:none;cursor:pointer">احجز الآن</button>
       </div>
 
     </div>
 
     <div style="text-align:center;margin-top:28px">
-      <a href="pricing.html" style="display:inline-flex;align-items:center;gap:8px;color:var(--blue-light);font-weight:700;font-size:.95rem;border:2px solid var(--blue-light);padding:10px 24px;border-radius:10px;transition:all .2s" onmouseover="this.style.background='var(--blue-light)';this.style.color='white'" onmouseout="this.style.background='';this.style.color='var(--blue-light)'">
+      <a href="pricing.html" style="display:inline-flex;align-items:center;gap:8px;color:var(--blue-light);font-weight:700;font-size:.95rem;border:2px solid var(--blue-light);padding:10px 24px;border-radius:10px;transition:all .2s">
         <i class="fas fa-tags"></i> عرض تفاصيل جميع الأسعار
       </a>
     </div>
@@ -1916,6 +1916,7 @@
     <button class="modal-close" id="receiptModalClose"><i class="fas fa-times"></i></button>
     <div class="modal-title">إرسال وصل الخلاص</div>
     <div class="modal-subtitle" id="receiptPlanInfo">عرض التسجيلات — 50 دينار سنوياً</div>
+    <input type="hidden" id="hiddenPlanId" value="videos_only">
 
     <ol class="receipt-steps">
       <li class="receipt-step">
@@ -2025,9 +2026,20 @@
   // ── Receipt modal ──
   window.openReceiptModal = function(plan) {
     const info = document.getElementById('receiptPlanInfo');
-    info.textContent = plan === 'sessions'
-      ? 'عرض الحصص المباشرة — 40 دينار / 8 حصص'
-      : 'عرض التسجيلات — 50 دينار سنوياً';
+    const PLAN_LABELS = {
+      trimester1:  'الثلاثي الأول (1 سبتمبر — 22 ديسمبر) — 100 د.ت',
+      trimester2:  'الثلاثي الثاني (23 ديسمبر — 22 مارس) — 90 د.ت',
+      trimester3:  'الثلاثي الثالث (23 مارس — 10 جوان) — 90 د.ت',
+      monthly:     'الاشتراك الشهري (30 يوماً) — 40 د.ت',
+      august:      'مراجعة أوت (1 — 31 أوت) — 50 د.ت',
+      videos_only: 'التسجيلات فقط (سنة كاملة) — 50 د.ت',
+      recordings:  'عرض التسجيلات — 50 د.ت سنوياً',
+      sessions:    'عرض الحصص المباشرة — 40 د.ت'
+    };
+    info.textContent = PLAN_LABELS[plan] || plan;
+    // حفظ قيمة العرض
+    const planInput = document.getElementById('hiddenPlanId');
+    if (planInput) planInput.value = plan;
     receiptModal.classList.add('open');
   };
 
@@ -2196,11 +2208,12 @@ document.getElementById('loginUserForm').addEventListener('submit', async e => {
     const user = auth.currentUser;
     if (!user) { toast('يجب تسجيل الدخول أولاً!', 'warning'); window.location.href='auth.html'; return; }
 
-    const name     = document.getElementById('receiptName').value;
-    const email    = document.getElementById('receiptEmail').value;
-    const file     = document.getElementById('receiptFile').files[0];
-    const notes    = document.getElementById('receiptNotes').value;
-    const planInfo = document.getElementById('receiptPlanInfo').textContent;
+    const name      = document.getElementById('receiptName').value;
+    const email     = document.getElementById('receiptEmail').value;
+    const file      = document.getElementById('receiptFile').files[0];
+    const notes     = document.getElementById('receiptNotes').value;
+    const planInfo  = document.getElementById('receiptPlanInfo').textContent;
+    const planId    = document.getElementById('hiddenPlanId')?.value || '';
     const submitBtn = e.target.querySelector('button[type="submit"]');
 
     if (!file) { toast('يرجى رفع صورة وصل الخلاص', 'warning'); return; }
@@ -2209,13 +2222,12 @@ document.getElementById('loginUserForm').addEventListener('submit', async e => {
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الرفع...';
 
     try {
-      // رفع الوصل على Cloudinary
       const receiptURL = await uploadReceipt(file);
 
-      // حفظ في Firestore
       await addDoc(collection(db, 'receipts'), {
         userId: user.uid,
         name, email, notes,
+        planId,
         plan: planInfo,
         receiptURL,
         status: 'pending',
