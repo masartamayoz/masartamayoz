@@ -1500,53 +1500,128 @@
     <div class="section-header">
       <div class="section-tag">العروض والأسعار</div>
       <h2>اختر العرض المناسب لك</h2>
-      <p>عرضان مرنان يناسبان جميع الاحتياجات بأسعار في متناول الجميع</p>
+      <p>عروض مرنة تناسب جميع الاحتياجات — التسجيلات مجانية مع أي اشتراك في الحصص</p>
     </div>
+
+    <!-- عرض التسجيلات -->
+    <div style="max-width:640px;margin:0 auto 32px;background:linear-gradient(135deg,var(--blue-dark),#1a3a6e);border-radius:18px;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px">
+      <div>
+        <div style="font-size:.82rem;font-weight:700;color:var(--gold-light);margin-bottom:4px">📹 عرض التسجيلات السنوي</div>
+        <div style="font-size:1.1rem;font-weight:800;color:white;margin-bottom:8px">مشاهدة جميع الدروس المسجّلة طوال السنة</div>
+        <ul style="list-style:none;display:flex;flex-wrap:wrap;gap:8px">
+          <li style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.85);padding:3px 10px;border-radius:50px;font-size:.78rem">✅ فيديو + PDF لكل درس</li>
+          <li style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.85);padding:3px 10px;border-radius:50px;font-size:.78rem">✅ فروض + تمارين</li>
+          <li style="background:rgba(16,185,129,.2);color:#6ee7b7;padding:3px 10px;border-radius:50px;font-size:.78rem;font-weight:700">🎁 مجاني مع الحصص</li>
+        </ul>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:2.8rem;font-weight:900;color:var(--gold);line-height:1">50</div>
+        <div style="color:rgba(255,255,255,.6);font-size:.88rem">د.ت / سنة</div>
+        <a href="auth.html#register" style="display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:var(--blue-dark);padding:10px 20px;border-radius:8px;font-weight:700;font-size:.88rem;margin-top:10px">
+          <i class="fas fa-play-circle"></i> اشترك
+        </a>
+      </div>
+    </div>
+
+    <!-- الحصص المباشرة -->
     <div class="pricing-grid">
 
-      <!-- العرض الأول -->
-      <div class="pricing-card">
-        <div class="plan-name">عرض التسجيلات</div>
-        <div class="plan-desc">مشاهدة جميع الدروس المسجلة في أي وقت</div>
-        <div class="plan-price">
-          <span class="price-amount">50</span>
-          <span class="price-currency">د.ت</span>
-          <span class="price-period">/ سنوياً</span>
-        </div>
-        <ul class="plan-features">
-          <li><i class="fas fa-check"></i> مشاهدة جميع التسجيلات</li>
-          <li><i class="fas fa-check"></i> الرياضيات 7 + 8 + 9</li>
-          <li><i class="fas fa-check"></i> تحديثات مستمرة طوال السنة</li>
-          <li><i class="fas fa-check"></i> لوحة تحكم شخصية</li>
-          <li><i class="fas fa-check"></i> متابعة ولي الأمر</li>
-        </ul>
-        <button class="btn-plan btn-plan-outline" onclick="openReceiptModal('recordings')">
-          اشترك الآن
-        </button>
-      </div>
-
-      <!-- العرض الثاني -->
+      <!-- ثلاثي 1 -->
       <div class="pricing-card featured">
         <div class="popular-badge">الأكثر طلباً</div>
-        <div class="plan-name">عرض الحصص المباشرة</div>
-        <div class="plan-desc">8 حصص مباشرة مع مدرس متخصص + التسجيلات</div>
+        <div class="plan-name">🏆 الثلاثي الأول</div>
+        <div class="plan-desc">1 سبتمبر — 22 ديسمبر 2025</div>
+        <div class="plan-price">
+          <span class="price-amount">100</span>
+          <span class="price-currency">د.ت</span>
+          <span class="price-period">~24 حصة</span>
+        </div>
+        <ul class="plan-features">
+          <li><i class="fas fa-check"></i> حصتان/أسبوع عبر Meet</li>
+          <li><i class="fas fa-check"></i> التسجيلات مجاناً</li>
+          <li><i class="fas fa-check"></i> تصحيح تمارين</li>
+          <li><i class="fas fa-check"></i> متابعة ولي الأمر</li>
+        </ul>
+        <a href="auth.html#register" class="btn-plan btn-plan-gold">احجز الآن</a>
+      </div>
+
+      <!-- ثلاثي 2 -->
+      <div class="pricing-card">
+        <div class="plan-name">الثلاثي الثاني</div>
+        <div class="plan-desc">23 ديسمبر 2025 — 22 مارس 2026</div>
+        <div class="plan-price">
+          <span class="price-amount">90</span>
+          <span class="price-currency">د.ت</span>
+          <span class="price-period">~22 حصة</span>
+        </div>
+        <ul class="plan-features">
+          <li><i class="fas fa-check"></i> حصتان/أسبوع عبر Meet</li>
+          <li><i class="fas fa-check"></i> التسجيلات مجاناً</li>
+          <li><i class="fas fa-check"></i> تصحيح تمارين</li>
+          <li><i class="fas fa-check"></i> متابعة ولي الأمر</li>
+        </ul>
+        <a href="auth.html#register" class="btn-plan btn-plan-outline">احجز الآن</a>
+      </div>
+
+      <!-- ثلاثي 3 -->
+      <div class="pricing-card">
+        <div class="plan-name">الثلاثي الثالث</div>
+        <div class="plan-desc">23 مارس — 10 جوان 2026</div>
+        <div class="plan-price">
+          <span class="price-amount">90</span>
+          <span class="price-currency">د.ت</span>
+          <span class="price-period">~22 حصة</span>
+        </div>
+        <ul class="plan-features">
+          <li><i class="fas fa-check"></i> حصتان/أسبوع عبر Meet</li>
+          <li><i class="fas fa-check"></i> التسجيلات مجاناً</li>
+          <li><i class="fas fa-check"></i> تصحيح تمارين</li>
+          <li><i class="fas fa-check"></i> متابعة ولي الأمر</li>
+        </ul>
+        <a href="auth.html#register" class="btn-plan btn-plan-outline">احجز الآن</a>
+      </div>
+
+      <!-- شهري -->
+      <div class="pricing-card">
+        <div class="plan-name">📅 الشهري</div>
+        <div class="plan-desc">30 يوماً من تاريخ التفعيل</div>
         <div class="plan-price">
           <span class="price-amount">40</span>
           <span class="price-currency">د.ت</span>
-          <span class="price-period">/ 8 حصص</span>
+          <span class="price-period">/ شهر</span>
         </div>
         <ul class="plan-features">
-          <li><i class="fas fa-check"></i> 8 حصص مباشرة عبر Google Meet</li>
-          <li><i class="fas fa-check"></i> مشاهدة التسجيلات مجاناً</li>
-          <li><i class="fas fa-check"></i> تفاعل مباشر مع المدرس</li>
-          <li><i class="fas fa-check"></i> تصحيح تمارين وواجبات</li>
-          <li><i class="fas fa-check"></i> متابعة مستمرة لولي الأمر</li>
+          <li><i class="fas fa-check"></i> حصتان/أسبوع</li>
+          <li><i class="fas fa-check"></i> التسجيلات مجاناً</li>
+          <li><i class="fas fa-check"></i> مرونة تامة</li>
+          <li><i class="fas fa-check"></i> ~8 حصص</li>
         </ul>
-        <button class="btn-plan btn-plan-gold" onclick="openReceiptModal('sessions')">
-          احجز حصصك الآن
-        </button>
+        <a href="auth.html#register" class="btn-plan btn-plan-outline">احجز الآن</a>
       </div>
 
+      <!-- مراجعة أوت -->
+      <div class="pricing-card" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);border-color:#8b5cf6">
+        <div class="plan-name" style="color:#c4b5fd">🌞 مراجعة أوت</div>
+        <div class="plan-desc" style="color:rgba(255,255,255,.65)">1 أوت — 31 أوت 2026</div>
+        <div class="plan-price">
+          <span class="price-amount" style="color:#c4b5fd">50</span>
+          <span class="price-currency" style="color:rgba(255,255,255,.6)">د.ت</span>
+          <span class="price-period" style="color:rgba(255,255,255,.5)">شهر مكثّف</span>
+        </div>
+        <ul class="plan-features">
+          <li style="color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.1)"><i class="fas fa-check" style="color:#c4b5fd"></i> ~8 حصص مكثّفة</li>
+          <li style="color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.1)"><i class="fas fa-check" style="color:#c4b5fd"></i> مراجعة شاملة</li>
+          <li style="color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.1)"><i class="fas fa-check" style="color:#c4b5fd"></i> التسجيلات مجاناً</li>
+        </ul>
+        <a href="auth.html#register" class="btn-plan" style="background:#8b5cf6;color:white;border:none">احجز الآن</a>
+      </div>
+
+    </div>
+
+    <div style="text-align:center;margin-top:28px">
+      <a href="pricing.html" style="display:inline-flex;align-items:center;gap:8px;color:var(--blue-light);font-weight:700;font-size:.95rem;border:2px solid var(--blue-light);padding:10px 24px;border-radius:10px;transition:all .2s" onmouseover="this.style.background='var(--blue-light)';this.style.color='white'" onmouseout="this.style.background='';this.style.color='var(--blue-light)'">
+        <i class="fas fa-tags"></i> عرض تفاصيل جميع الأسعار
+      </a>
     </div>
   </div>
 </section>
