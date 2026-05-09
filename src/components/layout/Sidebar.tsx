@@ -63,7 +63,8 @@ export default function Sidebar({ user, userData, isOpen, setIsOpen }: SidebarPr
       { id: 'children', icon: Users, label: 'متابعة الأبناء', href: '/dashboard?tab=children' },
       { id: 'schedule', icon: Calendar, label: 'الجداول الأسبوعية', href: '/dashboard?tab=schedule' },
       { id: 'absences', icon: Bell, label: 'الغيابات', href: '/dashboard?tab=absences' },
-      { id: 'pricing', icon: CreditCard, label: 'الاشتراكات', href: '/pricing' },
+      { id: 'wallet', icon: Wallet, label: 'المحفظة والاشتراكات', href: '/dashboard?tab=wallet' },
+      { id: 'pricing', icon: CreditCard, label: 'قائمة العروض', href: '/pricing' },
     ],
     teacher: [
       { id: 'overview', icon: LayoutDashboard, label: 'لوحة التحكم', href: '/dashboard' },

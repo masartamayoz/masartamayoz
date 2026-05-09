@@ -26,7 +26,9 @@ import {
   Zap,
   Receipt,
   Upload,
-  Image as ImageIcon
+  Image as ImageIcon,
+  FileText,
+  Eye
 } from 'lucide-react';
 import { handleFirestoreError, OperationType } from '@/src/lib/firestore-errors';
 import { addDoc, serverTimestamp } from 'firebase/firestore';
@@ -45,6 +47,8 @@ export default function StudentOverview({ activeTab, userData, user }: Props) {
   const [loading, setLoading] = useState(false);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
   const [receiptFile, setReceiptFile] = useState<string>('');
+  const [walletData, setWalletData] = useState<any>(null);
+  const [myReceipts, setMyReceipts] = useState<any[]>([]);
 
   const handleUploadReceipt = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,6 +152,17 @@ export default function StudentOverview({ activeTab, userData, user }: Props) {
           setGroupInfo({ id: gSnap.docs[0].id, ...gSnap.docs[0].data() });
         }
       }
+
+      // Fetch wallet info
+      const walletSnap = await getDocs(query(collection(db, 'wallets'), where('__name__', '==', user.uid)));
+      if (!walletSnap.empty) {
+        setWalletData(walletSnap.docs[0].data());
+      }
+
+      // Fetch my receipts
+      const rQuery = query(collection(db, 'receipts'), where('userId', '==', user.uid));
+      const rSnap = await getDocs(rQuery);
+      setMyReceipts(rSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a: any, b: any) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0)));
     } catch (err) {
       console.error(err);
     } finally {
@@ -556,7 +571,7 @@ export default function StudentOverview({ activeTab, userData, user }: Props) {
                <div className="bg-[#0A0D14] p-8 rounded-[28px] text-white shadow-2xl relative overflow-hidden group">
                  <p className="text-[0.65rem] font-black text-blue-light/60 uppercase tracking-widest mb-1">الرصيد المتاح</p>
                  <div className="flex items-baseline gap-2">
-                   <p className="text-4xl font-black text-white">0.000</p>
+                   <p className="text-4xl font-black text-white">{walletData?.balance || '0.000'}</p>
                    <p className="text-lg font-bold text-white/50">د.ت</p>
                  </div>
                </div>
@@ -566,16 +581,53 @@ export default function StudentOverview({ activeTab, userData, user }: Props) {
                   <div className="flex items-center gap-3">
                      <div className={cn(
                        "h-3 w-3 rounded-full",
-                       userData.subscriptionStatus === 'active' ? "bg-emerald-500" : "bg-amber-500"
+                       userData.subscriptionStatus === 'active' ? "bg-emerald-500" : 
+                       userData.subscriptionStatus === 'pending' ? "bg-amber-500" : "bg-gray-300"
                      )} />
-                     <span className="text-sm font-bold text-gray-700">
-                       {userData.subscriptionStatus === 'active' ? 'نشط' : 
-                        userData.subscriptionStatus === 'pending' ? 'بانتظار التفعيل' : 'غير مشترك'}
-                     </span>
+                     <div className="flex flex-col">
+                        <span className="text-sm font-black text-gray-700">
+                          {userData.subscriptionStatus === 'active' ? 'نشط' : 
+                           userData.subscriptionStatus === 'pending' ? 'بانتظار التفعيل' : 'غير مشترك'}
+                        </span>
+                        {userData.subscriptionStatus === 'active' && (
+                          <span className="text-[0.65rem] font-bold text-blue-brand">
+                            {walletData?.activeSubscription?.planName || userData.currentPlan || 'اشتراك عام'}
+                          </span>
+                        )}
+                     </div>
                   </div>
-                  {userData.subscriptionEnd && (
-                    <p className="text-[0.65rem] text-gray-400 mt-2">ينتهي في: {new Date(userData.subscriptionEnd).toLocaleDateString('ar-TN')}</p>
+                  {(userData.lastPaymentDate || walletData?.activeSubscription?.activatedAt) && (
+                    <p className="text-[0.65rem] text-gray-400 mt-2">
+                      آخر تفعيل: {new Date((walletData?.activeSubscription?.activatedAt?.toDate?.() || userData.lastPaymentDate?.toDate?.() || Date.now())).toLocaleDateString('ar-TN')}
+                    </p>
                   )}
+               </div>
+
+               {/* Receipt History */}
+               <div className="rounded-2xl border border-gray-100 p-6">
+                  <h4 className="text-sm font-black text-blue-dark mb-4 border-b pb-2">تاريخ العمليات</h4>
+                  <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1">
+                    {myReceipts.length > 0 ? myReceipts.map(r => (
+                      <div key={r.id} className="flex items-center justify-between group">
+                        <div className="flex items-center gap-3">
+                          <div className={cn(
+                            "h-8 w-8 rounded-lg flex items-center justify-center",
+                            r.status === 'approved' ? "bg-emerald-50 text-emerald-600" :
+                            r.status === 'rejected' ? "bg-red-50 text-red-500" : "bg-amber-50 text-amber-600"
+                          )}>
+                            <Receipt size={14} />
+                          </div>
+                          <div>
+                            <p className="text-[0.7rem] font-black text-blue-dark truncate w-24">{r.planName || 'اشتراك'}</p>
+                            <p className="text-[0.55rem] text-gray-400">{new Date(r.createdAt?.toDate()).toLocaleDateString('ar-TN')}</p>
+                          </div>
+                        </div>
+                        <span className="text-[0.6rem] font-black">{r.price || r.amount || '--'} د.ت</span>
+                      </div>
+                    )) : (
+                      <p className="text-[0.65rem] text-gray-400 text-center italic py-4">لا توجد عمليات سابقة</p>
+                    )}
+                  </div>
                </div>
             </div>
 

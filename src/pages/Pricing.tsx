@@ -1,7 +1,7 @@
 import Navbar from '@/src/components/layout/Navbar';
 import Footer from '@/src/components/layout/Footer';
 import { Check, X, ShieldQuestion, Tag, PlayCircle, Calendar, Rocket, Sun, Receipt, Upload, Loader2, Camera, AlertCircle } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/src/lib/utils';
 import { Link, useNavigate } from 'react-router-dom';
 import { auth, db } from '../lib/firebase';

@@ -427,11 +427,41 @@ export default function AdminOverview({ activeTab, userData, user }: Props) {
   const handleConfirmReceipt = async (receiptId: string, userId: string) => {
     setLoading(true);
     try {
-      await updateDoc(doc(db, 'receipts', receiptId), { status: 'approved' });
-      await updateDoc(doc(db, 'users', userId), { subscriptionStatus: 'active' });
-      alert('تم تفعيل الاشتراك بنجاح');
+      const receipt = data.receipts.find(r => r.id === receiptId);
+      if (!receipt) throw new Error('Receipt not found');
+
+      const planName = receipt.planName || receipt.plan || 'اشتراك';
+      const planPrice = receipt.price || receipt.amount || '0';
+
+      // 1. Update Receipt status
+      await updateDoc(doc(db, 'receipts', receiptId), { 
+        status: 'approved',
+        approvedAt: serverTimestamp()
+      });
+
+      // 2. Update User profile
+      await updateDoc(doc(db, 'users', userId), { 
+        subscriptionStatus: 'active',
+        currentPlan: planName,
+        plan: receipt.planId || 'general',
+        lastPaymentDate: serverTimestamp()
+      });
+
+      // 3. Update/Create Wallet Subscription record
+      await setDoc(doc(db, 'wallets', userId), {
+        activeSubscription: {
+          planName,
+          planId: receipt.planId || 'general',
+          activatedAt: serverTimestamp(),
+          price: planPrice
+        },
+        lastUpdated: serverTimestamp()
+      }, { merge: true });
+
+      alert('تم تفعيل الاشتراك وربطه بالمحفظة بنجاح');
     } catch (err) {
       handleFirestoreError(err, OperationType.UPDATE, 'receipts');
+      alert('حدث خطأ أثناء التفعيل');
     } finally {
       setLoading(false);
     }
