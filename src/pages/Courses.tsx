@@ -23,7 +23,15 @@ export default function Courses() {
   const [viewerItem, setViewerOpened] = useState<any | null>(null);
   const [activeRes, setActiveRes] = useState<{type: 'video' | 'pdf', url: string, name: string} | null>(null);
 
-  const LEVELS: Record<string, string> = { '7': 'السنة السابعة أساسي', '8': 'السنة الثامنة أساسي', '9': 'السنة التاسعة أساسي' };
+  const LEVELS: Record<string, string> = { 
+    '7': 'السنة السابعة أساسي', 
+    '8': 'السنة الثامنة أساسي', 
+    '9': 'السنة التاسعة أساسي',
+    '1sec': 'الأولى ثانوي',
+    '2sec': 'الثانية ثانوي',
+    '3sec': 'الثالثة ثانوي',
+    '4sec': 'الرابعة ثانوي (باكالوريا)'
+  };
   
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
@@ -117,8 +125,8 @@ export default function Courses() {
         {/* Content Filtering Sidebar - Modernized */}
         <aside className="w-[300px] border-l border-gray-100 bg-white hidden lg:flex flex-col shadow-sm">
           <div className="p-8 border-b border-gray-50 bg-gradient-to-br from-blue-dark to-blue-mid">
-             <label className="text-[0.65rem] font-black uppercase tracking-[0.15em] text-white/40 mb-4 block">اختر مستواك الدراسي</label>
-             <div className="flex gap-2.5">
+             <label className="text-[0.65rem] font-black uppercase tracking-[0.15em] text-white/40 mb-4 block">المستوى الدراسي (أساسي)</label>
+             <div className="flex gap-2 mb-6">
                {['7', '8', '9'].map(lvl => {
                  const isSameLevel = lvl === String(userData?.level);
                  const canAccess = userData?.userType === 'admin' || userData?.userType === 'teacher' || isSameLevel;
@@ -140,6 +148,36 @@ export default function Courses() {
                      {!canAccess && (
                        <div className="absolute -top-1 -right-1 bg-red-500 rounded-full p-1 shadow-lg flex items-center justify-center">
                          <Lock size={8} className="text-white" />
+                       </div>
+                     )}
+                   </button>
+                 );
+               })}
+             </div>
+
+             <label className="text-[0.65rem] font-black uppercase tracking-[0.15em] text-white/40 mb-4 block">المستوى الدراسي (ثانوي)</label>
+             <div className="grid grid-cols-2 gap-2">
+               {['1sec', '2sec', '3sec', '4sec'].map(lvl => {
+                 const isSameLevel = lvl === String(userData?.level);
+                 const canAccess = userData?.userType === 'admin' || userData?.userType === 'teacher' || isSameLevel;
+                 
+                 return (
+                   <button 
+                    key={lvl} 
+                    disabled={!canAccess}
+                    onClick={() => canAccess && setCurrentLevel(lvl)} 
+                    className={cn(
+                      "rounded-[14px] py-2.5 text-[0.8rem] font-black transition-all duration-300 relative", 
+                      currentLevel === lvl 
+                        ? "bg-gold-brand text-blue-dark shadow-lg shadow-gold-brand/20" 
+                        : "bg-white/5 text-white/60 hover:bg-white/10 border border-white/5",
+                      !canAccess && "opacity-40 cursor-not-allowed grayscale"
+                    )}
+                   >
+                     {lvl === '1sec' ? '1 ثانوي' : lvl === '2sec' ? '2 ثانوي' : lvl === '3sec' ? '3 ثانوي' : 'باكالوريا'}
+                     {!canAccess && (
+                       <div className="absolute -top-1 -right-1 bg-red-500 rounded-full p-1 shadow-lg flex items-center justify-center">
+                         <Lock size={6} className="text-white" />
                        </div>
                      )}
                    </button>
@@ -209,6 +247,10 @@ export default function Courses() {
                      <option value="7">السنة السابعة</option>
                      <option value="8">السنة الثامنة</option>
                      <option value="9">السنة التاسعة</option>
+                     <option value="1sec">السنة الأولى ثانوي</option>
+                     <option value="2sec">السنة الثانية ثانوي</option>
+                     <option value="3sec">السنة الثالثة ثانوي</option>
+                     <option value="4sec">باكالوريا</option>
                    </select>
                 </div>
              </div>

@@ -1,8 +1,9 @@
 export default function Levels() {
   const levels = [
-    { num: '7', title: 'السنة السابعة أساسي', desc: 'أسس الرياضيات ومفاهيمها الأولية بأسلوب تفاعلي ممتع', topics: ['الأعداد', 'الهندسة', 'القياس', 'المعطيات'] },
-    { num: '8', title: 'السنة الثامنة أساسي', desc: 'تعمّق في الرياضيات والتحضير الجيد للمرحلة المتقدمة', topics: ['الجبر', 'الهندسة', 'الإحصاء', 'الأعداد'] },
-    { num: '9', title: 'السنة التاسعة أساسي', desc: 'التحضير المكثف لمناظرة التاسعة مع مراجعة شاملة', topics: ['مناظرة', 'مراجعة', 'تمارين', 'اختبارات'] },
+    { num: '7', title: 'السنة السابعة أساسي', desc: 'تأسيس متين في الحساب والهندسة للانطلاق في المرحلة الإعدادية بنجاح.', topics: ['الأعداد', 'الهندسة', 'القياس'] },
+    { num: '8', title: 'السنة الثامنة أساسي', desc: 'تعميق المكتسبات والتحضير للدراسة التجريدية والمنطق الرياضي.', topics: ['الجبر', 'الهندسة', 'الإحصاء'] },
+    { num: '9', title: 'السنة التاسعة أساسي', desc: 'تحضير شامل لمناظرة شهادة ختم التعليم الأساسي (النوفيام).', topics: ['مناظرة', 'مراجعة', 'اختبارات'] },
+    { num: 'S', title: 'المرحلة الثانوية', desc: 'تحضير دقيق لكل المستويات الثانوية وصولاً إلى مناظرة الباكالوريا.', topics: ['تحليل', 'هندسة فضاء', 'احتمالات'] },
   ];
 
   return (
@@ -13,14 +14,14 @@ export default function Levels() {
             المستويات الدراسية
           </div>
           <h2 className="mb-3 text-3xl font-black text-blue-dark sm:text-4xl">
-            ثلاثة مستويات — مادة واحدة متقنة
+            من الإعدادي إلى الباكالوريا
           </h2>
           <p className="mx-auto max-w-[560px] text-[1.05rem] text-gray-600 font-Tajawal">
-            نبدأ بالرياضيات ونوسّع تدريجياً لتشمل جميع المواد
+            منصة مسار التميز ترافقك في كل مراحل تعليمك لتكون دائماً من الأوائل
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           {levels.map((lvl) => (
             <div key={lvl.num} className="group cursor-pointer rounded-[20px] border border-gray-200 bg-white p-7 transition-all hover:-translate-y-1 hover:border-blue-light hover:shadow-2xl">
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-light to-blue-mid text-lg font-black text-white">

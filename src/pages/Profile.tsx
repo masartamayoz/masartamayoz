@@ -161,8 +161,36 @@ export default function Profile() {
                                       <option value="7">السنة السابعة أساسي</option>
                                       <option value="8">السنة الثامنة أساسي</option>
                                       <option value="9">السنة التاسعة أساسي</option>
+                                      <option value="1sec">السنة الأولى ثانوي</option>
+                                      <option value="2sec">السنة الثانية ثانوي</option>
+                                      <option value="3sec">السنة الثالثة ثانوي</option>
+                                      <option value="4sec">باكالوريا</option>
                                    </select>
                                    <GraduationCap className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
+                                 </div>
+                              </div>
+                           )}
+
+                           {userData?.userType === 'student' && (
+                              <div className="rounded-2xl border border-blue-50 bg-blue-50/30 p-6 mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
+                                 <div>
+                                    <h4 className="text-sm font-black text-blue-dark">رمز التلميذ للمتابعة</h4>
+                                    <p className="text-[0.75rem] text-gray-500 font-bold font-Tajawal">أعطِ هذا الرمز لوليك ليتمكن من متابعة تقدمك.</p>
+                                 </div>
+                                 <div className="flex items-center gap-2 bg-white px-4 py-3 rounded-xl border border-blue-100 shadow-sm font-mono">
+                                    <code className="text-sm font-black text-blue-brand tracking-wider">{auth.currentUser?.uid}</code>
+                                    <button 
+                                      type="button"
+                                      onClick={() => {
+                                        if (auth.currentUser?.uid) {
+                                          navigator.clipboard.writeText(auth.currentUser.uid);
+                                          alert('تم نسخ الرمز');
+                                        }
+                                      }}
+                                      className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors text-blue-light"
+                                    >
+                                       <Save size={14} className="rotate-45" />
+                                    </button>
                                  </div>
                               </div>
                            )}

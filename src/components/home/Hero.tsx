@@ -21,7 +21,7 @@ export default function Hero() {
               تعلّم <span className="text-gold-brand text-yellow-500">الرياضيات</span> مع أفضل المدرّسين
             </h1>
             <p className="mb-9 max-w-[500px] text-lg text-white/80 ltr:text-left rtl:text-right">
-              حصص مباشرة وتسجيلات عالية الجودة للسنوات السابعة والثامنة والتاسعة أساسي. تعليم تفاعلي يضمن لك النجاح.
+              دروس مسجلة وحصص مباشرة عالية الجودة للمرحلتين الإعدادية والثانوية. تعليم تفاعلي وشامل يضمن لك التميز والنجاح.
             </p>
             <div className="flex flex-wrap gap-3.5 justify-start">
               <Link to="/auth" className="inline-flex items-center gap-2 rounded-xl bg-gold-brand px-8 py-3.5 font-bold text-blue-dark transition-all hover:bg-gold-light hover:-translate-y-0.5 hover:shadow-xl hover:shadow-gold-brand/35">
@@ -39,7 +39,7 @@ export default function Hero() {
                 <span className="text-[0.85rem] text-white/65">طالب مسجّل</span>
               </div>
               <div className="hero-stat">
-                <strong className="block text-3xl font-black text-gold-brand text-yellow-500">3</strong>
+                <strong className="block text-3xl font-black text-gold-brand text-yellow-500">7</strong>
                 <span className="text-[0.85rem] text-white/65">مستويات دراسية</span>
               </div>
               <div className="hero-stat">
@@ -57,9 +57,9 @@ export default function Hero() {
               </div>
               <ul className="space-y-2">
                 {[
-                  { name: 'الرياضيات', level: 'السنة السابعة أساسي', icon: '➗', badge: 'متاح', badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' },
-                  { name: 'الرياضيات', level: 'السنة الثامنة أساسي', icon: '➗', badge: 'متاح', badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' },
-                  { name: 'الرياضيات', level: 'السنة التاسعة أساسي', icon: '➗', badge: 'جديد', badgeColor: 'bg-gold-brand/20 text-gold-light border-gold-brand/30' },
+                  { name: 'الرياضيات', level: 'المرحلة الإعدادية (7، 8، 9)', icon: '➗', badge: 'متاح', badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' },
+                  { name: 'الرياضيات', level: 'المرحلة الثانوية (1، 2، 3، 4)', icon: '➗', badge: 'جديد', badgeColor: 'bg-gold-brand/20 text-gold-light border-gold-brand/30' },
+                  { name: 'دروس تجريبية', level: 'جميع المستويات', icon: '✨', badge: 'مجاني', badgeColor: 'bg-blue-light/20 text-blue-lighter border-blue-light/30' },
                 ].map((item, i) => (
                   <li key={i} className="flex items-center justify-between rounded-xl border border-white/8 bg-white/6 p-3.5 transition-all hover:bg-white/12">
                     <div className="flex items-center gap-3.5">

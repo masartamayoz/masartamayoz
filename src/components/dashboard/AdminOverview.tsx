@@ -647,6 +647,10 @@ export default function AdminOverview({ activeTab, userData, user }: Props) {
                 <option value="7">السنة السابعة</option>
                 <option value="8">السنة الثامنة</option>
                 <option value="9">السنة التاسعة</option>
+                <option value="1sec">السنة الأولى ثانوي</option>
+                <option value="2sec">السنة الثانية ثانوي</option>
+                <option value="3sec">السنة الثالثة ثانوي</option>
+                <option value="4sec">باكالوريا</option>
               </select>
             </div>
           )}
@@ -721,6 +725,10 @@ export default function AdminOverview({ activeTab, userData, user }: Props) {
                     <option value="7">السنة السابعة</option>
                     <option value="8">السنة الثامنة</option>
                     <option value="9">السنة التاسعة</option>
+                    <option value="1sec">السنة الأولى ثانوي</option>
+                    <option value="2sec">السنة الثانية ثانوي</option>
+                    <option value="3sec">السنة الثالثة ثانوي</option>
+                    <option value="4sec">باكالوريا</option>
                   </select>
                 </div>
                 <div className="space-y-2">
@@ -1438,6 +1446,10 @@ export default function AdminOverview({ activeTab, userData, user }: Props) {
                <option value="7">السنة السابعة</option>
                <option value="8">السنة الثامنة</option>
                <option value="9">السنة التاسعة</option>
+               <option value="1sec">السنة الأولى ثانوي</option>
+               <option value="2sec">السنة الثانية ثانوي</option>
+               <option value="3sec">السنة الثالثة ثانوي</option>
+               <option value="4sec">باكالوريا</option>
             </select>
           </div>
           <div className="space-y-2">
@@ -1614,6 +1626,10 @@ export default function AdminOverview({ activeTab, userData, user }: Props) {
                   <option value="7">السنة السابعة</option>
                   <option value="8">السنة الثامنة</option>
                   <option value="9">السنة التاسعة</option>
+                  <option value="1sec">السنة الأولى ثانوي</option>
+                  <option value="2sec">السنة الثانية ثانوي</option>
+                  <option value="3sec">السنة الثالثة ثانوي</option>
+                  <option value="4sec">باكالوريا</option>
                 </select>
               </div>
               <div className="space-y-2">
@@ -2069,6 +2085,10 @@ export default function AdminOverview({ activeTab, userData, user }: Props) {
                     <option value="7">السنة السابعة</option>
                     <option value="8">السنة الثامنة</option>
                     <option value="9">السنة التاسعة</option>
+                    <option value="1sec">السنة الأولى ثانوي</option>
+                    <option value="2sec">السنة الثانية ثانوي</option>
+                    <option value="3sec">السنة الثالثة ثانوي</option>
+                    <option value="4sec">باكالوريا</option>
                  </select>
                </div>
                <div className="space-y-2">
@@ -2399,6 +2419,10 @@ export default function AdminOverview({ activeTab, userData, user }: Props) {
                   <option value="7">السنة السابعة</option>
                   <option value="8">السنة الثامنة</option>
                   <option value="9">السنة التاسعة</option>
+                  <option value="1sec">السنة الأولى ثانوي</option>
+                  <option value="2sec">السنة الثانية ثانوي</option>
+                  <option value="3sec">السنة الثالثة ثانوي</option>
+                  <option value="4sec">باكالوريا</option>
                 </select>
               </div>
               <div className="space-y-2">
