@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-blue-dark: #070e17;
+  --color-blue-mid: #0a1628;
+  --color-blue-sidebar: #0a1628;
+  --color-blue-hover: #152541;
+  --color-blue-brand: #1e3a8a;
+  --color-blue-light: #3b82f6;
+  --color-gold-brand: #f59e0b;
+  --color-gold-light: #fbbf24;
+  
+  --radius-xl: 12px;
+  --radius-2xl: 20px;
+}
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-800 antialiased;
+    font-family: 'Tajawal', system-ui, sans-serif;
+  }
+}

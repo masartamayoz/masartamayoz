@@ -1,0 +1,134 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 1. Primitives & Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isEmailVerified() {
+      // Allow Google login users as verified by default if they have a verified token
+      return isSignedIn() && (request.auth.token.email_verified == true || request.auth.token.firebase.sign_in_provider == 'google.com');
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'masartamayoz@gmail.com' || 
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && getUserData().userType == 'admin')
+      );
+    }
+
+    function isTeacher() {
+      return isSignedIn() && (isAdmin() || (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && getUserData().userType == 'teacher'));
+    }
+
+    function isParent() {
+      return isSignedIn() && (isAdmin() || (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && getUserData().userType == 'parent'));
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // 2. Validation Helpers
+    function isValidUser(data) {
+      return data.email is string &&
+             data.userType in ['student', 'parent', 'teacher', 'admin'];
+    }
+
+    function isValidVideo(data) {
+      return data.title is string && data.title.size() <= 300 &&
+             data.type in ['lesson', 'exercise', 'assignment', 'synthesis'];
+    }
+
+    function isValidReceipt(data) {
+      return data.userId == request.auth.uid &&
+             data.receiptURL is string &&
+             data.status == 'pending';
+    }
+
+    // 3. Collection Rules
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isSignedIn() && (isOwner(userId) || isAdmin());
+      allow create: if isSignedIn() && (isOwner(userId) || isAdmin());
+      allow update: if isSignedIn() && (isAdmin() || isOwner(userId));
+      allow delete: if isAdmin();
+    }
+
+    // Videos Collection
+    match /videos/{videoId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Receipts Collection
+    match /receipts/{receiptId} {
+      allow read: if isAdmin() || (isSignedIn() && existing().userId == request.auth.uid);
+      allow create: if isSignedIn() && incoming().userId == request.auth.uid;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Groups Collection
+    match /groups/{groupId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Attendance Collection
+    match /attendance/{attendanceId} {
+      allow read: if isAdmin();
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    // Teacher Sessions
+    match /teacherSessions/{sessionId} {
+      allow read: if isAdmin() || (isSignedIn() && existing().teacherId == request.auth.uid);
+      allow create: if isTeacher() || isAdmin();
+      allow update: if isAdmin() || (isTeacher() && existing().teacherId == request.auth.uid);
+      allow delete: if isAdmin();
+    }
+
+    // Parent-Child links
+    match /parentChildren/{linkId} {
+      allow read: if isAdmin() || (isSignedIn() && (existing().parentId == request.auth.uid || existing().childId == request.auth.uid));
+      allow create: if isAdmin() || isParent();
+      allow delete: if isAdmin();
+    }
+
+    // Wallets
+    match /wallets/{userId} {
+      allow read: if isAdmin() || isOwner(userId);
+      allow write: if isAdmin();
+    }
+
+    // Connectivity Test
+    match /test/connection {
+      allow read: if true;
+    }
+  }
+}
