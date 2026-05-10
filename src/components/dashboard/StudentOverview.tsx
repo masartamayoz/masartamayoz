@@ -194,14 +194,14 @@ export default function StudentOverview({ activeTab, userData, user }: Props) {
     return (
       <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Welcome Banner */}
-        <div className="relative overflow-hidden rounded-[32px] bg-[#0A0D14] p-8 text-white shadow-2xl">
+        <div className="relative overflow-hidden rounded-[32px] bg-[#0A0D14] p-6 sm:p-8 text-white shadow-2xl">
           <div className="absolute right-0 top-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-light/20 blur-[100px]" />
           <div className="absolute left-0 bottom-0 h-40 w-40 -translate-x-1/2 translate-y-1/2 rounded-full bg-gold-brand/10 blur-[80px]" />
           
           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-right">
-              <h1 className="text-3xl md:text-3xl font-black text-white mb-2">مرحباً {displayName?.split(' ')[0]}! 👋</h1>
-              <p className="text-blue-light font-bold text-lg">أهلاً بك في مسار أكاديمي، استعد لرحلة التميز.</p>
+              <h1 className="text-2xl sm:text-3xl font-black text-white mb-2">مرحباً {displayName?.split(' ')[0]}! 👋</h1>
+              <p className="text-blue-light font-bold text-base sm:text-lg">أهلاً بك في مسار أكاديمي، استعد لرحلة التميز.</p>
             </div>
             
             {subscriptionStatus === 'active' ? (

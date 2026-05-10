@@ -71,11 +71,11 @@ export default function PricingPage() {
                <h2 className="text-3xl font-black text-blue-dark">شاهد الدروس في أي وقت</h2>
             </div>
             
-            <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl bg-gradient-to-br from-blue-dark to-blue-mid p-10 text-white shadow-2xl flex flex-wrap items-center justify-between gap-8 text-right">
-              <div className="flex-1 min-w-[300px]">
+            <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl bg-gradient-to-br from-blue-dark to-blue-mid p-6 sm:p-10 text-white shadow-2xl flex flex-wrap items-center justify-between gap-8 text-center sm:text-right">
+              <div className="flex-1 min-w-full sm:min-w-[300px]">
                 <h3 className="text-xl font-black text-gold-light mb-2">عرض التسجيلات السنوي</h3>
                 <p className="text-white/70 mb-6 font-Tajawal">مشاهدة التسجيلات فقط (لا يشمل الحصص المباشرة). مثالي لمن يريد المراجعة بمفرده.</p>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-right">
                   {['جميع دروس السنة مسجلة', 'تمارين وسلاسل محلولة', 'برنامج رسمي تونسي', 'متاح 24/7'].map(f => (
                     <li key={f} className="flex items-center gap-2 text-sm text-white/90">
                       <Check size={16} className="text-gold-brand" /> {f}
@@ -199,10 +199,10 @@ export default function PricingPage() {
                     <tr key={i} className="hover:bg-gray-50 transition-colors">
                       <td className="p-5 font-bold text-blue-dark">{row.label}</td>
                       {row.v.map((val, j) => (
-                        <td key={j} className="p-5 text-center">
+                        <td key={j} className="p-3 sm:p-5 text-center">
                           {val === true ? <Check className="mx-auto text-emerald-500" size={20} /> : 
                            val === false ? <X className="mx-auto text-red-300" size={18} /> : 
-                           <span className="font-bold text-gray-700">{val}</span>}
+                           <span className="font-bold text-gray-700 text-xs sm:text-base">{val}</span>}
                         </td>
                       ))}
                     </tr>

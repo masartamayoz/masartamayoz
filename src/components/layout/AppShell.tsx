@@ -120,9 +120,42 @@ export default function AppShell({ children, title, description }: AppShellProps
            </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto font-Tajawal bg-[#F8FAFC]">
+        <main className="flex-1 overflow-y-auto font-Tajawal bg-[#F8FAFC] pb-24 lg:pb-0">
           {children}
         </main>
+
+        {/* Mobile Bottom Navigation Bar */}
+        <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-gray-100 bg-white/95 p-3 backdrop-blur-md lg:hidden">
+           {[
+             { id: 'overview', icon: LayoutDashboard, label: 'لوحة التحكم', href: '/dashboard' },
+             { id: 'courses', icon: BookOpen, label: 'دروسي', href: '/courses' },
+             { id: 'wallet', icon: Wallet, label: 'المحفظة', href: '/dashboard?tab=wallet' },
+             { id: 'profile', icon: UserIcon, label: 'حسابي', href: '/profile' }
+           ].map((item) => {
+             const searchTab = new URLSearchParams(window.location.search).get('tab') || 'overview';
+             const isActive = window.location.pathname === item.href || 
+                             (window.location.pathname === '/dashboard' && searchTab === item.id);
+
+             return (
+               <Link 
+                 key={item.id} 
+                 to={item.href}
+                 className={cn(
+                   "flex flex-col items-center gap-1 transition-all",
+                   isActive ? "text-blue-brand" : "text-gray-400"
+                 )}
+               >
+                 <div className={cn(
+                   "flex h-10 w-10 items-center justify-center rounded-2xl transition-all",
+                   isActive ? "bg-blue-50" : "bg-transparent"
+                 )}>
+                   <item.icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                 </div>
+                 <span className="text-[0.62rem] font-black uppercase tracking-tighter">{item.label}</span>
+               </Link>
+             );
+           })}
+        </nav>
       </div>
     </div>
   );

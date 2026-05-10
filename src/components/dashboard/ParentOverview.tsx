@@ -415,14 +415,14 @@ export default function ParentOverview({ activeTab, userData, user }: Props) {
       {activeTab === 'overview' ? (
         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
            {/* Welcome Dashboard Banner */}
-           <div className="relative overflow-hidden rounded-[40px] bg-gradient-to-br from-[#0A0D14] to-blue-dark p-10 text-white shadow-2xl">
+           <div className="relative overflow-hidden rounded-[40px] bg-gradient-to-br from-[#0A0D14] to-blue-dark p-6 sm:p-10 text-white shadow-2xl">
               <div className="absolute right-0 top-0 h-64 w-64 translate-x-1/3 -translate-y-1/3 rounded-full bg-blue-light/10 blur-[100px]" />
               <div className="absolute left-0 bottom-0 h-48 w-48 -translate-x-1/4 translate-y-1/4 rounded-full bg-gold-brand/5 blur-[80px]" />
               
-              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8 text-center md:text-right">
                  <div>
-                    <h1 className="text-3xl font-black mb-2 text-white">لوحة تحكم الولي 👨‍👩‍👧‍👦</h1>
-                    <p className="text-blue-light/80 font-bold max-w-md">أهلاً بك أستاذ {userData?.displayName?.split(' ')[0]}، تابع مسار تفوق أطفالك في مكان واحد.</p>
+                    <h1 className="text-2xl sm:text-3xl font-black mb-2 text-white">لوحة تحكم الولي 👨‍👩‍👧‍👦</h1>
+                    <p className="text-blue-light/80 font-bold max-w-md text-sm sm:text-base">أهلاً بك أستاذ {userData?.displayName?.split(' ')[0]}، تابع مسار تفوق أطفالك في مكان واحد.</p>
                  </div>
                  <div className="flex gap-4">
                     <div className="bg-white/5 backdrop-blur-md border border-white/10 px-6 py-4 rounded-[24px] text-center">
@@ -685,8 +685,8 @@ export default function ParentOverview({ activeTab, userData, user }: Props) {
             </div>
 
             {activeTab === 'absences' ? (
-              <div className="overflow-hidden rounded-3xl border border-gray-100">
-                <table className="w-full text-right">
+              <div className="overflow-x-auto rounded-3xl border border-gray-100 pb-2">
+                <table className="w-full text-right min-w-[600px]">
                   <thead className="bg-gray-50 border-b border-gray-100">
                     <tr>
                       <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase">التلميذ</th>

@@ -96,13 +96,13 @@ export default function TeacherOverview({ activeTab, userData, user }: Props) {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Teacher Welcome & Wallet */}
       <div className="grid gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2 relative overflow-hidden rounded-[32px] bg-[#0A0D14] p-8 text-white shadow-2xl">
+        <div className="lg:col-span-2 relative overflow-hidden rounded-[32px] bg-[#0A0D14] p-6 sm:p-8 text-white shadow-2xl">
           <div className="absolute right-0 top-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-light/20 blur-[100px]" />
           <div className="relative z-10">
-            <h1 className="text-3xl font-black text-white mb-2">مرحباً أستاذ {userData?.displayName?.split(' ')[0]}! 👋</h1>
-            <p className="text-blue-light font-bold text-lg mb-8">مساهمتك تبني أجيالاً. إليك ملخص نشاطك.</p>
+            <h1 className="text-2xl sm:text-3xl font-black text-white mb-2">مرحباً أستاذ {userData?.displayName?.split(' ')[0]}! 👋</h1>
+            <p className="text-blue-light font-bold text-base sm:text-lg mb-8">مساهمتك تبني أجيالاً. إليك ملخص نشاطك.</p>
             
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-6 border-t border-white/5">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 pt-6 border-t border-white/5">
               <div>
                 <p className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest mb-1">إجمالي الحصص</p>
                 <p className="text-2xl font-black text-gold-brand">{stats.total}</p>
@@ -324,8 +324,8 @@ export default function TeacherOverview({ activeTab, userData, user }: Props) {
           </div>
         </div>
 
-        <div className="bg-white rounded-[40px] border border-gray-100 shadow-sm overflow-hidden min-h-[400px]">
-          <div className="grid grid-cols-[1.5fr_1.5fr_1fr_1fr] bg-gray-50/80 p-6 border-b border-gray-100 text-[0.65rem] font-black text-gray-400 uppercase tracking-widest text-center">
+        <div className="bg-white rounded-[40px] border border-gray-100 shadow-sm overflow-x-auto min-h-[400px]">
+          <div className="grid grid-cols-[1.5fr_1.5fr_1fr_1fr] bg-gray-50/80 p-6 border-b border-gray-100 text-[0.65rem] font-black text-gray-400 uppercase tracking-widest text-center min-w-[600px]">
              <div className="text-right pr-4">التلميذ</div>
              <div>المجموعة</div>
              <div>الوقت</div>

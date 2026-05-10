@@ -355,7 +355,7 @@ export default function Auth() {
                 {role === 'student' && (
                   <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                         <label className="mb-2.5 block text-[0.83rem] font-bold text-gray-700">المستوى الدراسي</label>
-                        <div className="grid grid-cols-4 gap-2">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                            {['7', '8', '9'].map(lvl => (
                              <button key={lvl} type="button" onClick={() => setLevel(lvl)} className={cn("rounded-xl border-1.5 py-2.5 text-[0.85rem] font-bold transition-all", level === lvl ? "border-blue-light bg-blue-light/8 text-blue-light shadow-sm" : "border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300")}>
                                السنة {lvl}
