@@ -39,20 +39,8 @@ export default function Sidebar({ user, userData, isOpen, setIsOpen }: SidebarPr
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const role = userData?.userType || 'student';
   const name = userData?.firstName ? `${userData.firstName} ${userData.lastName || ''}`.trim() : (user?.displayName || user?.email || '...');
-
-  useEffect(() => {
-    const checkMobile = () => {
-      const mobile = window.innerWidth < 1024;
-      setIsMobile(mobile);
-      if (!mobile) setIsOpen(false);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, [setIsOpen]);
 
   const handleLogout = async () => {
     await signOut(auth);
@@ -117,18 +105,19 @@ export default function Sidebar({ user, userData, isOpen, setIsOpen }: SidebarPr
       {/* Sidebar Content */}
       <motion.aside 
         initial={false}
-        animate={isMobile 
-          ? { x: isOpen ? 0 : '100%', width: 280 } 
-          : { x: 0, width: isCollapsed ? 88 : 280 }
-        }
-        transition={{ type: 'spring', stiffness: 400, damping: 40 }}
+        animate={{ 
+          width: isCollapsed ? 88 : 280,
+          translateX: isOpen ? 0 : (window.innerWidth < 1024 ? '100%' : '0%')
+        }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         className={cn(
-          "fixed inset-y-0 right-0 z-[110] bg-blue-sidebar text-white lg:static lg:flex lg:flex-col border-l border-white/5 shadow-2xl overflow-hidden"
+          "fixed inset-y-0 right-0 z-[110] bg-blue-sidebar text-white lg:static lg:flex lg:flex-col border-l border-white/5 shadow-2xl",
+          !isOpen && "translate-x-full lg:translate-x-0"
         )}
       >
         {/* Header/Logo */}
         <div className={cn(
-          "flex items-center justify-between border-b border-white/5 p-6 shrink-0",
+          "flex items-center justify-between border-b border-white/5 p-6",
           isCollapsed ? "justify-center px-4" : "p-6"
         )}>
           <Link to="/" className="flex items-center gap-3 overflow-hidden">
@@ -147,112 +136,111 @@ export default function Sidebar({ user, userData, isOpen, setIsOpen }: SidebarPr
             )}
           </Link>
           
-          <button onClick={() => setIsOpen(false)} className="lg:hidden text-white/40 hover:text-white p-2">
-            <X size={20} />
-          </button>
+          {!isCollapsed && (
+            <button onClick={() => setIsOpen(false)} className="lg:hidden text-white/40 hover:text-white">
+              <X size={20} />
+            </button>
+          )}
         </div>
 
-        {/* The middle part needs to be the one that scrolls */}
-        <div className="flex-1 overflow-y-auto scroll-smooth scrollbar-visible scrollbar-dark">
-          {/* User Card */}
-          <div className={cn("p-4 transition-all", isCollapsed ? "px-2" : "p-6")}>
-             <div className={cn(
-               "relative overflow-hidden rounded-[24px] bg-white/5 border border-white/10 text-white shadow-sm backdrop-blur-md transition-all",
-               isCollapsed ? "p-3" : "p-5"
-             )}>
-                <div className="absolute -top-8 -left-8 h-24 w-24 rounded-full bg-white/5" />
-                <div className="flex items-center gap-4 relative z-10">
-                   <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-2xl bg-gradient-to-br from-blue-light to-blue-brand flex items-center justify-center text-white font-black text-xl border border-white/10 shrink-0 shadow-lg">
-                      {name.charAt(0).toUpperCase()}
-                   </div>
-                   {!isCollapsed && (
-                     <motion.div 
-                       initial={{ opacity: 0 }}
-                       animate={{ opacity: 1 }}
-                       className="overflow-hidden"
-                     >
-                        <h4 className="truncate text-[0.85rem] font-bold">{name}</h4>
-                        <p className="text-[0.65rem] text-white/50 truncate font-medium">{userData?.email}</p>
-                     </motion.div>
-                   )}
-                </div>
-                {!isCollapsed && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mt-4 flex items-center justify-between relative z-10"
-                  >
-                     <div className="flex items-center gap-1.5">
-                        <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-                        <span className="text-[0.65rem] font-bold text-white/70">
-                           {role === 'student' ? 'تلميذ' : role === 'parent' ? 'ولي أمر' : role === 'teacher' ? 'أستاذ' : 'مدير'}
-                        </span>
-                     </div>
-                     <Link to="/profile" className="text-[0.68rem] font-bold text-gold-light hover:text-white transition-colors">تعديل</Link>
-                  </motion.div>
-                )}
-             </div>
-          </div>
+        {/* Toggle Button for Desktop */}
+        <button 
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="hidden lg:flex absolute -left-3 top-24 h-6 w-6 items-center justify-center rounded-full bg-gold-brand text-blue-dark shadow-lg z-[120] hover:scale-110 transition-transform"
+        >
+          {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+        </button>
 
-          {/* Toggle Button for Desktop */}
-          <button 
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="hidden lg:flex absolute -left-3 top-24 h-6 w-6 items-center justify-center rounded-full bg-gold-brand text-blue-dark shadow-lg z-[120] hover:scale-110 transition-transform"
-          >
-            {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-          </button>
-
-          {/* Navigation Section */}
-          <nav className="px-3 pb-6 space-y-1">
-            <p className={cn(
-              "px-4 text-[0.65rem] font-black uppercase tracking-[0.1em] text-white/20 mb-4 transition-all",
-              isCollapsed ? "opacity-0 h-0 p-0" : "opacity-100"
-            )}>
-              القائمة الرئيسية
-            </p>
-            {currentItems.map((item) => {
-              const currentTab = searchParams.get('tab') || 'overview';
-              const isActive = location.pathname === item.href || 
-                              (location.pathname === '/dashboard' && currentTab === item.id);
-              
-              return (
-                <Link
-                  key={item.id}
-                  to={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className={cn(
-                    "flex items-center px-4 py-3 rounded-2xl text-[0.92rem] font-bold transition-all group relative overflow-hidden",
-                    isCollapsed ? "justify-center gap-0" : "gap-3.5",
-                    isActive
-                      ? "bg-blue-hover text-white shadow-lg border border-white/10" 
-                      : "text-white/60 hover:bg-white/5 hover:text-white"
-                  )}
-                  title={isCollapsed ? item.label : ""}
+        {/* User Card */}
+        <div className={cn("p-4 transition-all", isCollapsed ? "px-2" : "p-6")}>
+           <div className={cn(
+             "relative overflow-hidden rounded-[24px] bg-white/5 border border-white/10 text-white shadow-sm backdrop-blur-md transition-all",
+             isCollapsed ? "p-3" : "p-5"
+           )}>
+              <div className="absolute -top-8 -left-8 h-24 w-24 rounded-full bg-white/5" />
+              <div className="flex items-center gap-4 relative z-10">
+                 <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-2xl bg-gradient-to-br from-blue-light to-blue-brand flex items-center justify-center text-white font-black text-xl border border-white/10 shrink-0 shadow-lg">
+                    {name.charAt(0).toUpperCase()}
+                 </div>
+                 {!isCollapsed && (
+                   <motion.div 
+                     initial={{ opacity: 0 }}
+                     animate={{ opacity: 1 }}
+                     className="overflow-hidden"
+                   >
+                      <h4 className="truncate text-[0.85rem] font-bold">{name}</h4>
+                      <p className="text-[0.65rem] text-white/50 truncate font-medium">{userData?.email}</p>
+                   </motion.div>
+                 )}
+              </div>
+              {!isCollapsed && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-4 flex items-center justify-between relative z-10"
                 >
-                  {isActive && (
-                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-gold-light rounded-r-full shadow-[0_0_12px_rgba(251,191,36,0.6)]" />
-                  )}
-                  <item.icon size={20} className={cn(
-                     "transition-all shrink-0",
-                     isActive ? "text-gold-light scale-110" : "text-white/40 group-hover:text-white group-hover:scale-110"
-                  )} />
-                  {!isCollapsed && (
-                    <motion.span
-                      initial={{ opacity: 0, x: 5 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="whitespace-nowrap"
-                    >
-                      {item.label}
-                    </motion.span>
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
+                   <div className="flex items-center gap-1.5">
+                      <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+                      <span className="text-[0.65rem] font-bold text-white/70">
+                         {role === 'student' ? 'تلميذ' : role === 'parent' ? 'ولي أمر' : role === 'teacher' ? 'أستاذ' : 'مدير'}
+                      </span>
+                   </div>
+                   <Link to="/profile" className="text-[0.68rem] font-bold text-gold-light hover:text-white transition-colors">تعديل</Link>
+                </motion.div>
+              )}
+           </div>
         </div>
 
-        {/* Bottom Actions - Fixed at bottom of sidebar */}
-        <div className={cn("p-4 border-t border-white/5 space-y-2 shrink-0", isCollapsed ? "px-2" : "p-6")}>
+        {/* Navigation Section */}
+        <nav className="flex-1 overflow-y-auto px-3 pb-6 space-y-1">
+          <p className={cn(
+            "px-4 text-[0.65rem] font-black uppercase tracking-[0.1em] text-white/20 mb-4 transition-all",
+            isCollapsed ? "opacity-0 h-0 p-0" : "opacity-100"
+          )}>
+            القائمة الرئيسية
+          </p>
+          {currentItems.map((item) => {
+            const currentTab = searchParams.get('tab') || 'overview';
+            const isActive = location.pathname === item.href || 
+                            (location.pathname === '/dashboard' && currentTab === item.id);
+            
+            return (
+              <Link
+                key={item.id}
+                to={item.href}
+                onClick={() => setIsOpen(false)}
+                className={cn(
+                  "flex items-center px-4 py-3 rounded-2xl text-[0.92rem] font-bold transition-all group relative overflow-hidden",
+                  isCollapsed ? "justify-center gap-0" : "gap-3.5",
+                  isActive
+                    ? "bg-blue-hover text-white shadow-lg border border-white/10" 
+                    : "text-white/60 hover:bg-white/5 hover:text-white"
+                )}
+                title={isCollapsed ? item.label : ""}
+              >
+                {isActive && (
+                   <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-gold-light rounded-r-full shadow-[0_0_12px_rgba(251,191,36,0.6)]" />
+                )}
+                <item.icon size={20} className={cn(
+                   "transition-all shrink-0",
+                   isActive ? "text-gold-light scale-110" : "text-white/40 group-hover:text-white group-hover:scale-110"
+                )} />
+                {!isCollapsed && (
+                  <motion.span
+                    initial={{ opacity: 0, x: 5 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="whitespace-nowrap"
+                  >
+                    {item.label}
+                  </motion.span>
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Bottom Actions */}
+        <div className={cn("p-4 border-t border-white/5 space-y-2", isCollapsed ? "px-2" : "p-6")}>
            <Link 
              to="/" 
              className={cn(
