@@ -28,7 +28,8 @@ import {
   Upload,
   Image as ImageIcon,
   FileText,
-  Eye
+  Eye,
+  Rocket
 } from 'lucide-react';
 import { handleFirestoreError, OperationType } from '@/src/lib/firestore-errors';
 import { addDoc, serverTimestamp } from 'firebase/firestore';
@@ -209,7 +210,10 @@ export default function StudentOverview({ activeTab, userData, user }: Props) {
                   <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
                   اشتراكك نشط
                 </div>
-                <p className="text-white/60 text-xs font-medium">خطتك: {plan === 'sessions' ? 'الحصص المباشرة' : 'المحتوى المسجل'}</p>
+                <p className="text-white/60 text-xs font-medium">
+                  {userData.currentPlan || (userData.planId?.includes('recording') ? 'المحتوى المسجل' : 'الحصص المباشرة')} 
+                  • {userData.subscriptionStatus === 'active' ? 'نشط' : 'بانتظار التفعيل'}
+                </p>
               </div>
             ) : (
               <div className="flex flex-col items-center md:items-end gap-3">

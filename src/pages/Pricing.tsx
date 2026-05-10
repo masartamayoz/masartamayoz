@@ -15,10 +15,6 @@ export default function PricingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [user, setUser] = useState<any>(null);
   const [userData, setUserData] = useState<any>(null);
-  const [showSubModal, setShowSubModal] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<any>(null);
-  const [uploading, setUploading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,38 +35,6 @@ export default function PricingPage() {
     }
     // Redirect logged-in user to dashboard wallet with plan selected
     navigate(`/dashboard?tab=wallet&planId=${plan.id}`);
-  };
-
-  const handleUploadReceipt = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || !selectedPlan) return;
-
-    setUploading(true);
-    try {
-      await addDoc(collection(db, 'receipts'), {
-        userId: user.uid,
-        userEmail: user.email,
-        userName: userData?.displayName || user.displayName,
-        planId: selectedPlan.id,
-        planName: selectedPlan.name,
-        price: selectedPlan.price,
-        status: 'pending',
-        createdAt: serverTimestamp(),
-        receiptURL: 'https://images.unsplash.com/photo-1554224155-169641357599?auto=format&fit=crop&q=80&w=300'
-      });
-
-      setSuccess(true);
-      setTimeout(() => {
-        setShowSubModal(false);
-        setSuccess(false);
-        navigate('/dashboard');
-      }, 3000);
-    } catch (err) {
-      console.error(err);
-      alert('حدث خطأ أثناء رفع الوصل');
-    } finally {
-      setUploading(false);
-    }
   };
 
   const plans = SUBSCRIPTION_PLANS;
@@ -292,104 +256,6 @@ export default function PricingPage() {
            </div>
         </section>
       
-      <AnimatePresence>
-        {showSubModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div 
-               initial={{ opacity: 0 }}
-               animate={{ opacity: 1 }}
-               exit={{ opacity: 0 }}
-               onClick={() => !uploading && setShowSubModal(false)}
-               className="absolute inset-0 bg-blue-dark/60 backdrop-blur-sm"
-            />
-            <motion.div 
-               initial={{ opacity: 0, scale: 0.9, y: 30 }}
-               animate={{ opacity: 1, scale: 1, y: 0 }}
-               exit={{ opacity: 0, scale: 0.9, y: 30 }}
-               className="relative w-full max-w-[560px] rounded-[36px] bg-white p-10 shadow-2xl text-right"
-            >
-              {!success ? (
-                <>
-                  <div className="mb-8 flex items-center justify-between">
-                     <button onClick={() => setShowSubModal(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                        <X size={20} />
-                     </button>
-                     <div className="flex items-center gap-3">
-                        <h2 className="text-2xl font-black text-blue-dark">إتمام الاشتراك</h2>
-                        <div className="h-12 w-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-brand">
-                           <Receipt size={24} />
-                        </div>
-                     </div>
-                  </div>
-
-                  <div className="mb-10 rounded-3xl bg-blue-50/50 border border-blue-100 p-6">
-                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-bold text-gray-500">العرض المختـار:</span>
-                        <span className="text-lg font-black text-blue-brand">{selectedPlan?.name}</span>
-                     </div>
-                     <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold text-gray-500">المبلغ المطلوب:</span>
-                        <span className="text-2xl font-black text-blue-dark">{selectedPlan?.price} د.ت</span>
-                     </div>
-                  </div>
-
-                  <div className="space-y-6">
-                     <div className="p-6 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50">
-                        <h4 className="font-black text-blue-dark mb-3">خطوات الدفع:</h4>
-                        <ol className="space-y-3 text-sm text-gray-600 font-bold list-decimal list-inside pr-2">
-                           <li>قم بالتحويل عبر <span className="text-blue-brand">D17</span> أو <span className="text-blue-brand">البريد</span> أو <span className="text-blue-brand">البنك</span>.</li>
-                           <li>الاسم: <span className="text-blue-dark">أكاديمية مسار التميز</span></li>
-                           <li>الرقم: <span className="text-blue-dark">17 000 000 000000 000</span></li>
-                           <li>صور "وصل الخلاص" (العملية بنجاح).</li>
-                        </ol>
-                     </div>
-
-                     <form onSubmit={handleUploadReceipt} className="space-y-6">
-                        <div className="space-y-2">
-                           <label className="text-[0.7rem] font-black text-gray-400 uppercase pr-2">تحميل صورة الوصل</label>
-                           <label className="relative flex min-h-[140px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-blue-100 bg-blue-50/30 transition-all hover:bg-blue-50 hover:border-blue-brand">
-                              <input type="file" required className="hidden" accept="image/*" />
-                              <Camera className="mb-2 text-blue-brand opacity-40" size={32} />
-                              <p className="text-sm font-black text-blue-brand">انقر لاختيار الصورة</p>
-                              <p className="text-[0.6rem] text-gray-400 mt-1">PNG, JPG (حد أقصى 5 ميجابايت)</p>
-                           </label>
-                        </div>
-
-                        <div className="flex gap-4 pt-4">
-                           <button 
-                             type="submit" 
-                             disabled={uploading}
-                             className="flex-[2] rounded-2xl bg-blue-brand py-4 text-sm font-black text-white shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                           >
-                             {uploading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
-                             إرسال الوصل للتفعيل
-                           </button>
-                        </div>
-                     </form>
-                  </div>
-                  
-                  <div className="mt-8 flex items-center gap-2 text-[0.7rem] font-bold text-amber-600 bg-amber-50 p-4 rounded-xl border border-amber-100">
-                     <AlertCircle size={14} />
-                     سيتم مراجعة الوصل وتفعيل حسابك يدوياً خلال أقل من 24 ساعة.
-                  </div>
-                </>
-              ) : (
-                <div className="py-12 text-center">
-                   <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-emerald-100 text-emerald-500 shadow-xl shadow-emerald-500/10">
-                      <Check size={48} strokeWidth={3} />
-                   </div>
-                   <h3 className="text-3xl font-black text-blue-dark mb-3">تم إرسال الوصل بنجاح!</h3>
-                   <p className="text-gray-500 font-bold max-w-xs mx-auto">شكراً لثقتكم. فريقنا يقوم الآن بمراجعة العملية وسيتم إرسال تنبيه لك فور التفعيل.</p>
-                   <div className="mt-10 flex items-center justify-center gap-2 text-sm font-black text-blue-brand">
-                      <Loader2 size={18} className="animate-spin" />
-                      جاري العودة للوحة التحكم...
-                   </div>
-                </div>
-              )}
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
       </main>
 
       <Footer />

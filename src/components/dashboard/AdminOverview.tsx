@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { SUBSCRIPTION_PLANS, PAYMENT_METHODS } from '@/src/constants';
 import { useNavigate } from 'react-router-dom';
 import { db, auth } from '@/src/lib/firebase';
 import { collection, query, where, getDocs, doc, updateDoc, serverTimestamp, orderBy, addDoc, deleteDoc, onSnapshot, setDoc } from 'firebase/firestore';
@@ -87,6 +88,7 @@ export default function AdminOverview({ activeTab, userData, user }: Props) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterLevel, setFilterLevel] = useState('all');
   const [filterType, setFilterType] = useState('all');
+  const [filterGroup, setFilterGroup] = useState('all');
   const [maintenanceLogs, setMaintenanceLogs] = useState<string[]>([]);
   const [isReseting, setIsReseting] = useState<string | null>(null);
   const [contentActionTab, setContentActionTab] = useState('add');
@@ -227,8 +229,13 @@ export default function AdminOverview({ activeTab, userData, user }: Props) {
     const unsubReceipts = onSnapshot(collection(db, 'receipts'), (snapshot) => {
       const receipts: any[] = [];
       snapshot.forEach(d => receipts.push({ id: d.id, ...d.data() }));
+      const revenue = receipts.filter(r => r.status === 'approved').reduce((acc, r) => acc + (parseFloat(r.price) || 0), 0);
       setData(prev => ({ ...prev, receipts }));
-      setStats(prev => ({ ...prev, receipts: receipts.filter(r => r.status === 'pending').length }));
+      setStats(prev => ({ 
+        ...prev, 
+        receipts: receipts.filter(r => r.status === 'pending').length,
+        revenue
+      }));
     }, (err) => handleFirestoreError(err, OperationType.LIST, 'receipts'));
 
     const unsubSessions = onSnapshot(collection(db, 'teacherSessions'), (snapshot) => {
@@ -467,10 +474,14 @@ export default function AdminOverview({ activeTab, userData, user }: Props) {
     }
   };
 
-  const handleRejectReceipt = async (receiptId: string) => {
+  const handleRejectReceipt = async (receiptId: string, reason?: string) => {
     setLoading(true);
     try {
-      await updateDoc(doc(db, 'receipts', receiptId), { status: 'rejected' });
+      await updateDoc(doc(db, 'receipts', receiptId), { 
+        status: 'rejected',
+        rejectionReason: reason || 'الوصل غير واضح أو المعلومات غير متطابقة',
+        rejectedAt: serverTimestamp()
+      });
       toast.success('تم رفض الوصل');
       setPendingDelete(null);
     } catch (err) {
@@ -1700,7 +1711,11 @@ export default function AdminOverview({ activeTab, userData, user }: Props) {
         ? true 
         : (u.userType === 'student' && u.level === filterLevel);
 
-      return matchesSearch && matchesTab && matchesLevel;
+      const matchesGroup = filterGroup === 'all'
+        ? true
+        : u.group === filterGroup;
+
+      return matchesSearch && matchesTab && matchesLevel && matchesGroup;
     }).sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
 
     return (
@@ -1819,31 +1834,52 @@ export default function AdminOverview({ activeTab, userData, user }: Props) {
            </AnimatePresence>
         </div>
 
-        {/* Level Filters for Students */}
+        {/* Level & Group Filters for Students */}
         {(filterType === 'student' || filterType === 'all') && (
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-3 bg-gray-50/50 p-2 rounded-2xl border border-gray-100 w-fit"
-          >
-             <div className="px-3 text-[0.65rem] font-black text-gray-400 uppercase tracking-wider border-l border-gray-200">تصفية حسب المستوى:</div>
-             <div className="flex gap-2">
-                {['all', '7', '8', '9'].map(lvl => (
-                  <button
-                    key={lvl}
-                    onClick={() => setFilterLevel(lvl)}
-                    className={cn(
-                      "px-5 py-2 rounded-xl text-[0.65rem] font-black transition-all",
-                      filterLevel === lvl 
-                        ? "bg-blue-brand text-white shadow-md shadow-blue- brand/20" 
-                        : "bg-white text-gray-400 border border-gray-100 hover:bg-gray-100"
-                    )}
-                  >
-                    {lvl === 'all' ? 'الكل' : `السنة ${lvl}`}
-                  </button>
-                ))}
-             </div>
-          </motion.div>
+          <div className="flex flex-wrap items-center gap-4">
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-3 bg-gray-50/50 p-2 rounded-2xl border border-gray-100 w-fit"
+            >
+               <div className="px-3 text-[0.65rem] font-black text-gray-400 uppercase tracking-wider border-l border-gray-200">تصفية حسب المستوى:</div>
+               <div className="flex gap-2">
+                  {['all', '7', '8', '9', '1sec', '2sec', '3sec', '4sec'].map(lvl => (
+                    <button
+                      key={lvl}
+                      onClick={() => setFilterLevel(lvl)}
+                      className={cn(
+                        "px-5 py-2 rounded-xl text-[0.65rem] font-black transition-all",
+                        filterLevel === lvl 
+                          ? "bg-blue-brand text-white shadow-md shadow-blue-brand/20" 
+                          : "bg-white text-gray-400 border border-gray-100 hover:bg-gray-100"
+                      )}
+                    >
+                      {lvl === 'all' ? 'الكل' : lvl.includes('sec') ? lvl : `السنة ${lvl}`}
+                    </button>
+                  ))}
+               </div>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+              className="flex items-center gap-3 bg-gray-50/50 p-2 rounded-2xl border border-gray-100 w-fit"
+            >
+               <div className="px-3 text-[0.65rem] font-black text-gray-400 uppercase tracking-wider border-l border-gray-200">تصفية حسب المجموعة:</div>
+               <select 
+                 value={filterGroup} 
+                 onChange={e => setFilterGroup(e.target.value)}
+                 className="bg-white border border-gray-100 rounded-xl px-4 py-2 text-[0.65rem] font-black text-blue-dark outline-none focus:ring-2 ring-blue-100"
+               >
+                 <option value="all">كل المجموعات</option>
+                 {data.groups.filter(g => filterLevel === 'all' || g.level === filterLevel).map(g => (
+                   <option key={g.id} value={g.name}>{g.name}</option>
+                 ))}
+               </select>
+            </motion.div>
+          </div>
         )}
 
         <div className="bg-white rounded-[40px] border border-gray-100 shadow-sm overflow-x-auto min-h-[400px] flex flex-col">
@@ -1936,7 +1972,7 @@ export default function AdminOverview({ activeTab, userData, user }: Props) {
                           </div>
                         )}
                      </div>
-                     <div>
+                     <div className="flex flex-col items-center gap-1">
                         <div className={cn(
                           "inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-[0.62rem] font-black ring-1",
                           u.subscriptionStatus === 'active' 
@@ -1946,6 +1982,11 @@ export default function AdminOverview({ activeTab, userData, user }: Props) {
                           {u.subscriptionStatus === 'active' ? <CheckCircle size={12} strokeWidth={3} /> : <XCircle size={12} strokeWidth={3} />}
                           <span>{u.subscriptionStatus === 'active' ? 'مفعل' : 'موقوف'}</span>
                         </div>
+                        {u.currentPlan && (
+                          <span className="text-[0.55rem] font-bold text-blue-light/70 text-center max-w-[80px] break-words">
+                            {u.currentPlan}
+                          </span>
+                        )}
                      </div>
                      <div className="flex flex-col items-center">
                         <span className="text-[0.7rem] font-black text-gray-500">{u.createdAt ? new Date(u.createdAt.toDate ? u.createdAt.toDate() : u.createdAt).toLocaleDateString('ar-TN') : '---'}</span>
@@ -2013,9 +2054,17 @@ export default function AdminOverview({ activeTab, userData, user }: Props) {
                         <div>
                            <h4 className="text-sm font-black text-blue-dark">{u?.displayName || 'مستخدم مجهول'}</h4>
                            <p className="text-[0.65rem] text-gray-400 font-bold">{u?.phone || 'بدون هاتف'} • {new Date(r.createdAt?.toDate()).toLocaleString('ar-TN')}</p>
-                           <div className="mt-2 flex gap-2">
+                           <div className="mt-2 flex flex-wrap gap-2">
                              <span className="px-2 py-0.5 rounded-lg bg-blue-50 text-blue-dark text-[0.55rem] font-black">{r.planName || r.plan || 'اشتراك'}</span>
                              <span className="px-2 py-0.5 rounded-lg bg-amber-50 text-amber-600 text-[0.55rem] font-black">{r.price || r.amount || '--'} د.ت</span>
+                             {r.paymentMethod && (
+                               <span className="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-600 text-[0.55rem] font-black border border-emerald-100">
+                                 {PAYMENT_METHODS.find(m => m.id === r.paymentMethod)?.name || r.paymentMethod}
+                               </span>
+                             )}
+                             {r.parentName && (
+                               <span className="px-2 py-0.5 rounded-lg bg-indigo-50 text-indigo-600 text-[0.55rem] font-black">ولي الرفع: {r.parentName}</span>
+                             )}
                            </div>
                         </div>
                      </div>
@@ -2027,7 +2076,10 @@ export default function AdminOverview({ activeTab, userData, user }: Props) {
                           تأكيد وتفعيل
                         </button>
                         <button 
-                          onClick={() => handleRejectReceipt(r.id)}
+                          onClick={() => {
+                            const reason = prompt('سبب الرفض (اختياري):', 'الوصل غير واضح أو المعلومات غير متطابقة');
+                            if (reason !== null) handleRejectReceipt(r.id, reason);
+                          }}
                           className="px-4 py-2 rounded-xl bg-red-50 text-red-500 text-[0.65rem] font-black hover:bg-red-500 hover:text-white transition-all"
                         >
                           رفض
@@ -2047,11 +2099,11 @@ export default function AdminOverview({ activeTab, userData, user }: Props) {
            <div className="bg-blue-dark rounded-[32px] p-8 text-white shadow-xl shadow-blue-900/20 relative overflow-hidden">
               <div className="absolute -bottom-10 -right-10 h-40 w-40 rounded-full bg-white/5" />
               <p className="text-[0.65rem] font-bold text-blue-light uppercase tracking-widest mb-2">إجمالي المداخيل التقريبية</p>
-              <h2 className="text-4xl font-black mb-6">4,280 <span className="text-sm font-bold text-blue-light">د.ت</span></h2>
+              <h2 className="text-4xl font-black mb-6">{stats.revenue.toLocaleString('ar-TN')} <span className="text-sm font-bold text-blue-light">د.ت</span></h2>
               <div className="space-y-3 pt-4 border-t border-white/10">
                  <div className="flex justify-between items-center text-[0.65rem]">
                     <span className="text-white/60">هذا الشهر</span>
-                    <span className="font-black text-emerald-400">+1,120 د.ت</span>
+                    <span className="font-black text-emerald-400">+{data.receipts.filter(r => r.status === 'approved' && r.createdAt?.toDate() > new Date(Date.now() - 86400000)).reduce((a, b) => a + (parseFloat(b.price) || 0), 0)} د.ت</span>
                  </div>
                  <div className="flex justify-between items-center text-[0.65rem]">
                     <span className="text-white/60">اشتراكات مفعلة</span>
